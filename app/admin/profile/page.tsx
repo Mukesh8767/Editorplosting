@@ -69,7 +69,7 @@ export default function AdminProfilePage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/upload-media", {
+      const res = await fetch("/api/upload-author-photo", {
         method: "POST",
         body: formData,
       });

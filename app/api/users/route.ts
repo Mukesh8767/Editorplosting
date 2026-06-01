@@ -24,7 +24,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
-  const { username, displayName, password, authorImageUrl } = await request.json();
+  const { username, displayName, password, authorImageUrl, avatarUrl } = await request.json();
   const email = username?.trim();
 
   if (!email || !displayName || !password) {
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
   }
 
   const usernameValue = email.split("@")[0];
+  const imageUrl = avatarUrl ?? authorImageUrl ?? null;
 
   const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
     email,
@@ -52,7 +53,8 @@ export async function POST(request: NextRequest) {
         username: usernameValue,
         full_name: displayName,
         role: "author",
-        author_image_url: authorImageUrl ?? null,
+        author_image_url: imageUrl,
+        avatar_url: imageUrl,
       },
     ])
     .select()
@@ -67,13 +69,14 @@ export async function POST(request: NextRequest) {
     username: profileData.email,
     displayName: profileData.full_name || profileData.username || profileData.email,
     role: profileData.role,
-    avatarUrl: profileData.author_image_url ?? null,
+    avatarUrl: profileData.author_image_url ?? profileData.avatar_url ?? null,
   });
 }
 
 export async function PATCH(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
-  const { id, displayName, password, avatarUrl } = await request.json();
+  const { id, displayName, password, avatarUrl, authorImageUrl } = await request.json();
+  const imageUrl = avatarUrl ?? authorImageUrl ?? null;
 
   if (!id || !displayName) {
     return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
@@ -83,7 +86,8 @@ export async function PATCH(request: NextRequest) {
     .from("profiles")
     .update({
       full_name: displayName,
-      author_image_url: avatarUrl ?? null,
+      author_image_url: imageUrl,
+      avatar_url: imageUrl,
     })
     .eq("id", id)
     .select()
@@ -107,7 +111,7 @@ export async function PATCH(request: NextRequest) {
     username: profileData.email,
     displayName: profileData.full_name || profileData.username || profileData.email,
     role: profileData.role,
-    avatarUrl: profileData.author_image_url ?? null,
+    avatarUrl: profileData.author_image_url ?? profileData.avatar_url ?? null,
   });
 }
 

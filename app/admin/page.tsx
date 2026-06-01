@@ -8,6 +8,7 @@ import {
   getAllBlogs,
   getSession,
   getUsers,
+  getUserBlogs,
   deleteUser,
   createUser,
   updateUser,
@@ -31,13 +32,23 @@ export default function AdminPage() {
   useEffect(() => {
     const load = async () => {
       const currentUser = getSession();
-      if (!currentUser || currentUser.role !== "admin") {
+      if (!currentUser) {
         router.push("/login");
         return;
       }
+
       setSession(currentUser);
-      setBlogs(await getAllBlogs());
-      setUsers(await getUsers());
+
+      // If admin, load all blogs and users. If author/editor, load only their blogs and hide user management.
+      if (currentUser.role === "admin") {
+        setBlogs(await getAllBlogs());
+        setUsers(await getUsers());
+      } else {
+        // authors/editors: fetch only their blogs
+        const authorBlogs = await getUserBlogs(currentUser.id);
+        setBlogs(authorBlogs);
+        setUsers([]);
+      }
     };
 
     load();
@@ -162,106 +173,108 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Users Section */}
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-8 shadow-2xl">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-white">Author Users</h2>
-              <p className="text-slate-400 mt-1">Manage author accounts and permissions</p>
-            </div>
-            <button
-              onClick={() => {
-                setEditingUser(null);
-                setUsername("");
-                setDisplayName("");
-                setPassword("");
-                setError("");
-                setMessage("");
-                setShowForm(true);
-              }}
-              className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-lg"
-            >
-              + Add Author
-            </button>
-          </div>
-
-          {/* Stats */}
-          <div className="mb-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
-            <p className="text-slate-300">
-              Total Authors: <span className="text-emerald-400 font-bold text-lg">{users.length}</span>
-            </p>
-          </div>
-
-          {/* Users List */}
-          <div className="space-y-3">
-            {users.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-slate-400 mb-4">No authors yet. Create one to get started.</p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition"
-                >
-                  Create First Author
-                </button>
+        {/* Users Section (visible to admins only) */}
+        {session?.role === "admin" && (
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-8 shadow-2xl">
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-white">Author Users</h2>
+                <p className="text-slate-400 mt-1">Manage author accounts and permissions</p>
               </div>
-            ) : (
-              users.map((user) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-4 hover:border-slate-600 transition group"
-                >
-                  <div className="flex-1">
-                    <p className="text-lg font-bold text-white group-hover:text-emerald-400 transition">
-                      {user.displayName}
-                    </p>
-                    <p className="text-sm text-slate-400">
-                      {user.username} • <span className="capitalize text-slate-300">{user.role}</span>
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEditUser(user)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user.id)}
-                      className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+              <button
+                onClick={() => {
+                  setEditingUser(null);
+                  setUsername("");
+                  setDisplayName("");
+                  setPassword("");
+                  setError("");
+                  setMessage("");
+                  setShowForm(true);
+                }}
+                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-lg"
+              >
+                + Add Author
+              </button>
+            </div>
 
-          {/* Quick Links */}
-          <div className="mt-8 pt-6 border-t border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/admin/posts"
-              className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
-            >
-              <p className="text-emerald-400 font-bold">Manage Posts</p>
-              <p className="text-xs text-slate-400 mt-1">Edit, create, and publish content</p>
-            </Link>
-            <Link
-              href="/admin/topics"
-              className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
-            >
-              <p className="text-emerald-400 font-bold">Categories</p>
-              <p className="text-xs text-slate-400 mt-1">Organize content by topics</p>
-            </Link>
-            <Link
-              href="/admin/profile"
-              className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
-            >
-              <p className="text-emerald-400 font-bold">My Profile</p>
-              <p className="text-xs text-slate-400 mt-1">Manage your account settings</p>
-            </Link>
+            {/* Stats */}
+            <div className="mb-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700">
+              <p className="text-slate-300">
+                Total Authors: <span className="text-emerald-400 font-bold text-lg">{users.length}</span>
+              </p>
+            </div>
+
+            {/* Users List */}
+            <div className="space-y-3">
+              {users.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-slate-400 mb-4">No authors yet. Create one to get started.</p>
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition"
+                  >
+                    Create First Author
+                  </button>
+                </div>
+              ) : (
+                users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg p-4 hover:border-slate-600 transition group"
+                  >
+                    <div className="flex-1">
+                      <p className="text-lg font-bold text-white group-hover:text-emerald-400 transition">
+                        {user.displayName}
+                      </p>
+                      <p className="text-sm text-slate-400">
+                        {user.username} • <span className="capitalize text-slate-300">{user.role}</span>
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEditUser(user)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Quick Links */}
+            <div className="mt-8 pt-6 border-t border-slate-700 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link
+                href="/admin/posts"
+                className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
+              >
+                <p className="text-emerald-400 font-bold">Manage Posts</p>
+                <p className="text-xs text-slate-400 mt-1">Edit, create, and publish content</p>
+              </Link>
+              <Link
+                href="/admin/topics"
+                className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
+              >
+                <p className="text-emerald-400 font-bold">Categories</p>
+                <p className="text-xs text-slate-400 mt-1">Organize content by topics</p>
+              </Link>
+              <Link
+                href="/admin/profile"
+                className="p-4 bg-slate-900/50 border border-slate-700 rounded-lg hover:border-slate-600 hover:bg-slate-800/50 transition"
+              >
+                <p className="text-emerald-400 font-bold">My Profile</p>
+                <p className="text-xs text-slate-400 mt-1">Manage your account settings</p>
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Modal */}

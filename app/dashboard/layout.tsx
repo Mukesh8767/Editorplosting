@@ -1,0 +1,84 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { getSession } from "@/lib/blog-store";
+
+const baseNav = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "My Posts", href: "/dashboard/posts" },
+  { label: "Create Post", href: "/dashboard/posts/create" },
+  { label: "Categories", href: "/dashboard/topics" },
+  { label: "Brochures", href: "/dashboard/brochures" },
+  { label: "Profile", href: "/dashboard/profile" },
+];
+
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const [sessionRole, setSessionRole] = useState<string | null>(null);
+  const [verified, setVerified] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const s = getSession();
+    if (!s) {
+      router.push("/login");
+      return;
+    }
+    // If an admin accidentally accesses author dashboard, let them through or redirect. 
+    // Here we let author/editor/admin through, but check their role.
+    setSessionRole(s.role ?? null);
+    setVerified(true);
+  }, [router]);
+
+  if (!verified) {
+    return <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">Loading session...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      <div className="mx-auto flex min-h-screen max-w-420">
+        {/* Sidebar */}
+        <aside className="hidden w-80 shrink-0 flex-col border-r border-slate-200 bg-slate-950 text-white lg:flex font-sans">
+          <div className="flex h-24 items-center border-b border-slate-800 px-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-emerald-400 font-bold">Author Studio</p>
+              <h1 className="mt-2 text-2xl font-semibold text-white">Sustainability</h1>
+            </div>
+          </div>
+
+          <nav className="flex-1 space-y-2 px-4 py-8">
+            {baseNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="block rounded-3xl px-5 py-4 text-sm font-semibold text-slate-200 transition hover:bg-slate-800 hover:text-white"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="border-t border-slate-800 px-6 py-6">
+            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Workspace</p>
+              <p className="mt-3 text-sm font-semibold text-white">Create blogs, upload brochures, and manage your custom profile.</p>
+              <Link
+                href="/login"
+                className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
+              >
+                Switch Account
+              </Link>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main content area */}
+        <main className="flex-1 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+          <div className="mx-auto max-w-350">{children}</div>
+        </main>
+      </div>
+    </div>
+  );
+}

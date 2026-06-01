@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import BlockEditor, { type Block } from "../BlockEditor";
+import BlockEditor, { type Block } from "@/app/admin/posts/BlockEditor";
 import { getTopics, getSession } from "@/lib/blog-store";
 
 const renderBlock = (block: any) => {
@@ -25,16 +25,16 @@ const renderBlock = (block: any) => {
         {url ? (
           <img src={url} alt={extractText(block.data?.caption) || "image"} className="w-full rounded-2xl object-cover" />
         ) : (
-          <div className="rounded-2xl bg-slate-50 p-6 text-center text-slate-500">No image</div>
+          <div className="rounded-2xl bg-slate-800 p-6 text-center text-slate-500">No image</div>
         )}
-        {extractText(block.data?.caption) ? <figcaption className="mt-2 text-sm text-slate-600">{extractText(block.data?.caption)}</figcaption> : null}
+        {extractText(block.data?.caption) ? <figcaption className="mt-2 text-sm text-slate-400">{extractText(block.data?.caption)}</figcaption> : null}
       </figure>
     );
   }
   return null;
 };
 
-export default function CreatePostPage() {
+export default function AuthorCreatePostPage() {
   const [postId, setPostId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -55,6 +55,7 @@ export default function CreatePostPage() {
   const [isFeatured, setIsFeatured] = useState<boolean>(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
   const router = useRouter();
 
   const subCategories = topics.filter((topic) => topic.parent_id === topicId);
@@ -122,6 +123,8 @@ export default function CreatePostPage() {
         }
       } catch (err) {
         console.error("Error loading editor data", err);
+      } finally {
+        setPageLoading(false);
       }
     };
 
@@ -191,42 +194,58 @@ export default function CreatePostPage() {
       payload.id = postId;
     }
 
-    const res = await fetch("/api/blogs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setMessage(data?.error || "Unable to save post.");
-      return;
-    }
+    try {
+      const res = await fetch("/api/blogs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (!res.ok) {
+        setMessage(data?.error || "Unable to save post.");
+        return;
+      }
+      
+      if (!postId && data?.id) {
+        setPostId(data.id);
+      }
 
-    if (!postId && data?.id) {
-      setPostId(data.id);
+      setMessage(publish ? "Post published successfully." : "Draft saved successfully.");
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setMessage("Operation failed. Check network.");
+      setLoading(false);
     }
-
-    setMessage(publish ? "Post published successfully." : "Draft saved successfully.");
   };
 
+  if (pageLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-slate-400">Loading editor...</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="px-4 py-8 sm:px-6 lg:px-8 text-white min-h-screen font-sans">
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mb-8 rounded-[40px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        {/* Top Header Card */}
+        <div className="mb-8 rounded-[40px] border border-slate-800 bg-slate-900/50 p-6 shadow-xl sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.32em] text-slate-500">Create post</p>
-              <h1 className="mt-3 text-3xl font-semibold text-slate-950">New blog post</h1>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Fill in the important post details above, then use the editor and preview side-by-side below.
+              <p className="text-sm uppercase tracking-[0.32em] text-emerald-400 font-bold">
+                {postId ? "Edit Post" : "Create Post"}
+              </p>
+              <h1 className="mt-3 text-3xl font-bold text-white">
+                {postId ? "Edit blog post" : "New blog post"}
+              </h1>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Update the article metadata in the form, and craft your story using the block editor and live preview side-by-side.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                onClick={() => router.push("/admin/posts")}
-                className="inline-flex items-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                onClick={() => router.push("/dashboard/posts")}
+                className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 px-5 py-3 text-sm font-semibold text-white transition"
               >
                 Back
               </button>
@@ -234,7 +253,7 @@ export default function CreatePostPage() {
                 type="button"
                 onClick={() => handleSave(false)}
                 disabled={loading}
-                className="inline-flex items-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center rounded-full bg-slate-950 hover:bg-slate-850 border border-slate-750 px-5 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Save draft
               </button>
@@ -242,7 +261,7 @@ export default function CreatePostPage() {
                 type="button"
                 onClick={() => handleSave(true)}
                 disabled={loading}
-                className="inline-flex items-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-500 transition disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-emerald-700/20"
               >
                 Publish
               </button>
@@ -250,56 +269,59 @@ export default function CreatePostPage() {
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-700">Logged in as</p>
-              <p className="mt-1 text-base font-semibold text-slate-900">{authorName || "Unknown user"}</p>
+              <p className="text-sm font-medium text-slate-450">Logged in as</p>
+              <p className="mt-1 text-base font-semibold text-emerald-400">{authorName || "Unknown user"}</p>
             </div>
             {message ? (
-              <div className="rounded-3xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{message}</div>
+              <div className="rounded-2xl bg-emerald-950/60 border border-emerald-800 px-4 py-3 text-sm text-emerald-350">{message}</div>
             ) : null}
           </div>
         </div>
 
+        {/* Form Inputs Grid */}
         <div className="mx-auto max-w-5xl space-y-6">
-          <div className="rounded-[40px] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
             <div className="grid gap-4 xl:grid-cols-3">
               <div className="xl:col-span-3">
-                <label className="block text-sm font-medium text-slate-700">Title</label>
+                <label className="block text-sm font-semibold text-slate-200">Title</label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-lg font-semibold text-slate-900"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-lg font-bold text-white focus:border-emerald-500 focus:outline-none transition"
+                  placeholder="The title of your article"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Excerpt</label>
+                <label className="block text-sm font-semibold text-slate-200">Excerpt</label>
                 <input
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  placeholder="Short summarizing description"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Tags</label>
+                <label className="block text-sm font-semibold text-slate-200">Tags</label>
                 <input
                   value={tagsInput}
                   onChange={(e) => setTagsInput(e.target.value)}
-                  placeholder="Add tags separated by commas"
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                  placeholder="e.g. Energy, Solar, Green"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
                 />
                 <p className="mt-2 text-xs text-slate-500">Separate tags with commas. New tags are created automatically.</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Category</label>
+                <label className="block text-sm font-semibold text-slate-200">Category</label>
                 <select
                   value={topicId ?? ""}
                   onChange={(e) => {
                     setTopicId(e.target.value || null);
                     setSubtopicId(null);
                   }}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
                 >
                   <option value="">Select category</option>
                   {topics.filter((t) => !t.parent_id).map((t) => (
@@ -309,12 +331,12 @@ export default function CreatePostPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Subcategory</label>
+                <label className="block text-sm font-semibold text-slate-200">Subcategory</label>
                 <select
                   value={subtopicId ?? ""}
                   onChange={(e) => setSubtopicId(e.target.value || null)}
                   disabled={subCategories.length === 0}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition disabled:cursor-not-allowed disabled:bg-slate-900"
                 >
                   {subCategories.length > 0 ? (
                     <>
@@ -330,7 +352,7 @@ export default function CreatePostPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Cover image or video</label>
+                <label className="block text-sm font-semibold text-slate-200">Cover image or video</label>
                 <div className="mt-2 flex items-center gap-3">
                   <input
                     type="file"
@@ -355,38 +377,40 @@ export default function CreatePostPage() {
                         setUploadingCover(false);
                       }
                     }}
-                    className="rounded-2xl"
+                    className="rounded-2xl text-sm"
                   />
-                    <input
-                      placeholder="or paste image/video url"
-                      value={coverImageUrl ?? ""}
-                      onChange={(e) => setCoverImageUrl(e.target.value || null)}
-                      className="flex-1 rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
-                    />
-                  {uploadingCover ? <div className="text-sm text-slate-500">Uploading…</div> : null}
+                  <input
+                    placeholder="or paste url directly"
+                    value={coverImageUrl ?? ""}
+                    onChange={(e) => setCoverImageUrl(e.target.value || null)}
+                    className="flex-1 rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-emerald-500 focus:outline-none transition"
+                  />
+                  {uploadingCover ? <div className="text-sm text-emerald-400">Uploading…</div> : null}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">SEO title</label>
+                <label className="block text-sm font-semibold text-slate-200">SEO title</label>
                 <input
                   value={seoTitle ?? ""}
                   onChange={(e) => setSeoTitle(e.target.value || null)}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 focus:border-emerald-500 focus:outline-none transition"
+                  placeholder="Custom SEO Title"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">SEO description</label>
+                <label className="block text-sm font-semibold text-slate-200">SEO description</label>
                 <input
                   value={seoDescription ?? ""}
                   onChange={(e) => setSeoDescription(e.target.value || null)}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  placeholder="Search engine meta description"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Canonical URL or image</label>
+                <label className="block text-sm font-semibold text-slate-200">Canonical URL / image</label>
                 <div className="mt-2 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <input
@@ -412,25 +436,25 @@ export default function CreatePostPage() {
                           setUploadingCover(false);
                         }
                       }}
-                      className="rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                      className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm"
                     />
-                    <span className="text-sm text-slate-500">Upload image</span>
+                    <span className="text-xs text-slate-405">Upload thumbnail image</span>
                   </div>
                   <input
-                    placeholder="or paste canonical URL / image URL"
+                    placeholder="or paste canonical URL"
                     value={canonicalUrl ?? ""}
                     onChange={(e) => setCanonicalUrl(e.target.value || null)}
-                    className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700">Status</label>
+                <label className="block text-sm font-semibold text-slate-200">Status</label>
                 <select
                   value={statusVal}
                   onChange={(e) => setStatusVal(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-slate-900"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
@@ -438,10 +462,10 @@ export default function CreatePostPage() {
               </div>
 
                <div>
-                <label className="block text-sm font-medium text-slate-700">Reading time (automatic)</label>
-                <div className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 flex items-center gap-2">
-                  <span className="text-emerald-600 font-bold text-lg">{readingTime ?? 1}</span>
-                  <span className="text-sm text-slate-600 font-medium">min read (estimated from word count)</span>
+                <label className="block text-sm font-semibold text-slate-205">Reading time (automatic)</label>
+                <div className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 flex items-center gap-2">
+                  <span className="text-emerald-400 font-bold text-lg">{readingTime ?? 1}</span>
+                  <span className="text-sm text-slate-400 font-medium">min read (estimated from word count)</span>
                 </div>
               </div>
 
@@ -451,29 +475,32 @@ export default function CreatePostPage() {
                   type="checkbox"
                   checked={isFeatured}
                   onChange={(e) => setIsFeatured(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                  className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-emerald-600 focus:ring-emerald-500"
                 />
-                <label htmlFor="featured" className="text-sm font-medium text-slate-700">Feature this post</label>
+                <label htmlFor="featured" className="text-sm font-semibold text-slate-200">Feature this post on dashboard</label>
               </div>
             </div>
           </div>
 
+          {/* Editor & Preview Split Panel */}
           <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            <div className="rounded-[40px] border border-slate-200 bg-white p-6 shadow-sm">
+            {/* Block Editor */}
+            <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-slate-950">Post content</h2>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-500">Editor</span>
+                <h2 className="text-lg font-bold text-white">Post Content</h2>
+                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-400 font-semibold">Editor</span>
               </div>
               <BlockEditor value={blocks} onChange={setBlocks} />
             </div>
 
-            <div className="rounded-[40px] border border-slate-200 bg-white p-6 shadow-sm">
+            {/* Live Preview */}
+            <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-slate-950">Live preview</h2>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-500">Preview</span>
+                <h2 className="text-lg font-bold text-white">Live Layout Preview</h2>
+                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-400 font-semibold">Preview</span>
               </div>
               {coverImageUrl ? (
-                <div className="mb-4 overflow-hidden rounded-3xl bg-slate-100">
+                <div className="mb-4 overflow-hidden rounded-3xl bg-slate-950 border border-slate-800">
                   {coverImageUrl.match(/\.(mp4|webm|ogg)$/i) ? (
                     <video src={coverImageUrl} controls className="h-52 w-full object-cover" />
                   ) : (
@@ -481,20 +508,20 @@ export default function CreatePostPage() {
                   )}
                 </div>
               ) : null}
-              <div className="space-y-4 text-slate-950">
+              <div className="space-y-4 text-slate-100">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-950">{authorName || "Author"}</div>
+                    <div className="text-sm font-bold text-white">{authorName || "Author"}</div>
                     <div className="text-xs text-slate-500">{new Date().toLocaleDateString()}</div>
                   </div>
-                  <div className="rounded-full bg-slate-100 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-600">{statusVal}</div>
+                  <div className="rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-400">{statusVal}</div>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold text-slate-950">{title || "Untitled post"}</h3>
-                  {seoTitle ? <p className="mt-2 text-sm text-slate-700">{seoTitle}</p> : null}
+                  <h3 className="text-2xl font-bold text-white leading-snug">{title || "Untitled post"}</h3>
+                  {seoTitle ? <p className="mt-2 text-xs text-emerald-400 font-semibold">SEO: {seoTitle}</p> : null}
                 </div>
-                {excerpt ? <p className="text-sm leading-7 text-slate-950">{excerpt}</p> : null}
-                <article className="prose prose-slate max-w-none text-slate-950">
+                {excerpt ? <p className="text-sm leading-relaxed text-slate-350">{excerpt}</p> : null}
+                <article className="prose prose-invert max-w-none text-slate-205">
                   {blocks.map((b) => renderBlock(b))}
                 </article>
               </div>

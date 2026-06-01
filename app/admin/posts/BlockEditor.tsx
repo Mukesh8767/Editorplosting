@@ -63,66 +63,49 @@ const createBlock = (type: "h1" | "h2" | "p" | "image"): Block => {
 };
 
 export default function BlockEditor({ value, onChange }: { value?: Block[]; onChange: (blocks: Block[]) => void }) {
-  const [blocks, setBlocks] = useState<Block[]>(value && value.length > 0 ? value : [createBlock("p")]);
   const [showMenu, setShowMenu] = useState(false);
   const [menuIndex, setMenuIndex] = useState<number | null>(null);
-  const hasMounted = useRef(false);
 
-  useEffect(() => {
-    if (value && value.length > 0) {
-      setBlocks(value);
-    }
-  }, [value]);
-
-  useEffect(() => {
-    if (!hasMounted.current) {
-      hasMounted.current = true;
-      return;
-    }
-    onChange(blocks);
-  }, [blocks, onChange]);
+  // Fallback to a default empty paragraph block if no content exists yet
+  const activeBlocks = value && value.length > 0 ? value : [{ id: "init-p", type: "paragraph", data: { text: [{ text: "" }] } } as Block];
 
   const updateBlock = (id: string, newBlock: Partial<Block>) => {
-    setBlocks((current) =>
-      current.map((block) => (block.id === id ? ({ ...block, ...newBlock } as Block) : block))
-    );
+    const next = activeBlocks.map((block) => (block.id === id ? ({ ...block, ...newBlock } as Block) : block));
+    onChange(next);
   };
 
   const insertBlockAfter = (index: number, block: Block) => {
-    setBlocks((current) => {
-      const next = [...current];
-      next.splice(index + 1, 0, block);
-      return next;
-    });
+    const next = [...activeBlocks];
+    next.splice(index + 1, 0, block);
+    onChange(next);
   };
 
   const addBlock = (type: "h1" | "h2" | "p" | "image") => {
-    setBlocks((current) => [...current, createBlock(type)]);
+    onChange([...activeBlocks, createBlock(type)]);
   };
 
-  const removeBlock = (id: string) => setBlocks((current) => current.filter((block) => block.id !== id));
+  const removeBlock = (id: string) => {
+    onChange(activeBlocks.filter((block) => block.id !== id));
+  };
 
   const moveBlock = (id: string, direction: -1 | 1) => {
-    setBlocks((current) => {
-      const index = current.findIndex((block) => block.id === id);
-      if (index === -1) return current;
-      const nextIndex = index + direction;
-      if (nextIndex < 0 || nextIndex >= current.length) return current;
-      const next = [...current];
-      const [moved] = next.splice(index, 1);
-      next.splice(nextIndex, 0, moved);
-      return next;
-    });
+    const index = activeBlocks.findIndex((block) => block.id === id);
+    if (index === -1) return;
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= activeBlocks.length) return;
+    const next = [...activeBlocks];
+    const [moved] = next.splice(index, 1);
+    next.splice(nextIndex, 0, moved);
+    onChange(next);
   };
 
   const updateText = (id: string, text: string) => {
-    setBlocks((current) =>
-      current.map((block) =>
-        block.id === id
-          ? ({ ...block, data: { ...(block.data as any), text: [{ text }] } } as Block)
-          : block
-      )
+    const next = activeBlocks.map((block) =>
+      block.id === id
+        ? ({ ...block, data: { ...(block.data as any), text: [{ text }] } } as Block)
+        : block
     );
+    onChange(next);
   };
 
   const uploadImage = async (file: File, id: string) => {
@@ -133,20 +116,18 @@ export default function BlockEditor({ value, onChange }: { value?: Block[]; onCh
       if (error) throw error;
       const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
       const url = urlData.publicUrl;
-      setBlocks((current) =>
-        current.map((block) =>
-          block.id === id ? ({ ...block, data: { ...(block.data as any), url } } as Block) : block
-        )
+      const next = activeBlocks.map((block) =>
+        block.id === id ? ({ ...block, data: { ...(block.data as any), url } } as Block) : block
       );
+      onChange(next);
     } catch {
       const reader = new FileReader();
       reader.onload = () => {
         const url = String(reader.result);
-        setBlocks((current) =>
-          current.map((block) =>
-            block.id === id ? ({ ...block, data: { ...(block.data as any), url } } as Block) : block
-          )
+        const next = activeBlocks.map((block) =>
+          block.id === id ? ({ ...block, data: { ...(block.data as any), url } } as Block) : block
         );
+        onChange(next);
       };
       reader.readAsDataURL(file);
     }
@@ -167,7 +148,7 @@ export default function BlockEditor({ value, onChange }: { value?: Block[]; onCh
       </div>
 
       <div className="space-y-4">
-        {blocks.map((block, index) => (
+        {activeBlocks.map((block, index) => (
           <section key={block.id} className="rounded-4xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <span className="text-xs uppercase tracking-[0.24em] text-slate-500">{block.type}</span>

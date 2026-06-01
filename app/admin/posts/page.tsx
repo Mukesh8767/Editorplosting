@@ -14,7 +14,7 @@ import {
   type User,
 } from "@/lib/blog-store";
 
-type FormTopic = Topic & { parent_id: string | null };
+type FormTopic = Topic & { parent_id?: string | null };
 
 export default function AdminPostsPage() {
   const [session, setSession] = useState<User | null>(null);
@@ -34,21 +34,40 @@ export default function AdminPostsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const current = getSession();
-      if (!current || current.role !== "admin") {
-        router.push("/login");
-        return;
+      try {
+        const current = getSession();
+        if (!current) {
+          router.push("/login");
+          return;
+        }
+        setSession(current);
+        setTopics(await getTopics());
+
+        if (current.role === "admin") {
+          setUsers(await getUsers());
+          setPosts(await getAllBlogs());
+        } else {
+          // authors/editors: show only their posts and set author to current user
+          setUsers([]);
+          setAuthorId(current.id);
+          const userPosts = await (await fetch(`/api/blogs?userId=${encodeURIComponent(current.id)}`)).json();
+          setPosts(userPosts || []);
+        }
+      } catch (error) {
+        console.error("Failed to load admin data", error);
+        setMessage("Unable to load admin data. Please refresh or check your network.");
       }
-      setSession(current);
-      setUsers(await getUsers());
-      setTopics(await getTopics());
-      setPosts(await getAllBlogs());
     };
     load();
   }, [router]);
 
   const refreshPosts = async () => {
-    setPosts(await getAllBlogs());
+    if (session?.role === "admin") {
+      setPosts(await getAllBlogs());
+    } else if (session) {
+      const userPosts = await (await fetch(`/api/blogs?userId=${encodeURIComponent(session.id)}`)).json();
+      setPosts(userPosts || []);
+    }
   };
 
   const mainCategories = topics.filter((t) => !t.parent_id);
@@ -119,9 +138,9 @@ export default function AdminPostsPage() {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm uppercase tracking-[0.32em] text-emerald-400">Admin Posts</p>
-              <h1 className="mt-3 text-4xl font-bold text-white">Manage All Posts</h1>
+              <h1 className="mt-3 text-4xl font-bold text-white">Manage Posts</h1>
               <p className="mt-2 max-w-2xl text-base leading-7 text-slate-400">
-                Browse, preview, edit, and manage all blog posts. Create new content from the admin editor.
+                Browse, preview, edit, and manage your blog posts. Admins can see all posts.
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
@@ -146,7 +165,7 @@ export default function AdminPostsPage() {
             <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 shadow-xl">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">All Posts</h2>
+                  <h2 className="text-2xl font-bold text-white">Posts</h2>
                   <p className="mt-2 text-sm text-slate-400">Click any post to open the full admin preview page or edit.</p>
                 </div>
                 <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 text-sm font-semibold text-emerald-400">

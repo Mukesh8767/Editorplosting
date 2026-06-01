@@ -28,12 +28,20 @@ export default function BlogPostPage() {
         <div className="mt-6 flex flex-col gap-4 text-sm">
           <div className="flex items-center gap-3">
             <img
-              src={post.author?.avatar_url || post.author?.author_image_url || "/default-avatar.png"}
-              alt={post.author?.full_name || post.author?.username || "Author"}
+              src={
+                post.author?.avatar_url ||
+                post.author?.author_image_url ||
+                post.authorAvatarUrl ||
+                post.authorImageUrl ||
+                "/default-avatar.png"
+              }
+              alt={post.author?.full_name || post.author?.username || post.authorName || "Author"}
               className="h-12 w-12 rounded-full object-cover border border-slate-700"
             />
             <div>
-              <div className="text-white font-semibold">By {post.author?.full_name || post.author?.username || "Unknown author"}</div>
+              <div className="text-white font-semibold">
+                By {post.author?.full_name || post.author?.username || post.authorName || "Unknown author"}
+              </div>
               <div className="text-slate-400">{post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}</div>
             </div>
           </div>

@@ -9,7 +9,13 @@ type Post = {
   excerpt?: string | null;
   slug?: string | null;
   cover_image_url?: string | null;
-  author?: { full_name?: string };
+  author?: {
+    full_name?: string;
+    username?: string;
+    avatar_url?: string | null;
+    author_image_url?: string | null;
+  };
+  authorName?: string;
   published_at?: string | null;
   tags?: string[];
 };
@@ -56,8 +62,17 @@ export default function PostsPage() {
                   </div>
                 ) : null}
                 <p className="mt-3 text-slate-400 line-clamp-2">{p.excerpt}</p>
-                <div className="mt-4 text-sm text-slate-500">
-                  <span className="text-slate-300">{p.author?.full_name}</span> • {p.published_at ? new Date(p.published_at).toLocaleDateString() : ""}
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                  <img
+                    src={p.author?.avatar_url || p.author?.author_image_url || "/default-avatar.png"}
+                    alt={p.author?.full_name || p.author?.username || "Author"}
+                    className="h-8 w-8 rounded-full object-cover border border-slate-700"
+                  />
+                  <span className="text-slate-300">
+                    {p.author?.full_name || p.author?.username || p.authorName || "Unknown author"}
+                  </span>
+                  <span className="text-slate-500">•</span>
+                  <span>{p.published_at ? new Date(p.published_at).toLocaleDateString() : ""}</span>
                 </div>
               </article>
             ))}

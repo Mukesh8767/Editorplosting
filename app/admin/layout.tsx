@@ -1,15 +1,34 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
+"use client";
 
-const navItems = [
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { getSession } from "@/lib/blog-store";
+
+const baseNav = [
   { label: "Dashboard", href: "/admin" },
   { label: "All Posts", href: "/admin/posts" },
   { label: "Create Post", href: "/admin/posts/create" },
   { label: "Categories", href: "/admin/topics" },
+  { label: "Brochures", href: "/admin/brochures" },
   { label: "Profile", href: "/admin/profile" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const [sessionRole, setSessionRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const s = getSession();
+    if (s) setSessionRole(s.role ?? null);
+  }, []);
+
+  const navItems = baseNav.map((item) => {
+    if (item.href === "/admin/posts" && sessionRole !== "admin") {
+      return { ...item, label: "My Posts" };
+    }
+    return item;
+  });
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-420">

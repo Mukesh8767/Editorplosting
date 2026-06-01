@@ -25,7 +25,7 @@ const renderBlock = (block: any) => {
 
   if (block.type === "heading") {
     return (
-      <h2 key={block.id || Math.random()} className="mt-8 text-2xl font-semibold text-slate-950">
+      <h2 key={block.id || Math.random()} className="mt-8 text-2xl font-semibold text-slate-100">
         {extractText(block.data?.text)}
       </h2>
     );
@@ -33,7 +33,7 @@ const renderBlock = (block: any) => {
 
   if (block.type === "paragraph" || block.type === "text") {
     return (
-      <p key={block.id || Math.random()} className="mt-4 leading-8 text-slate-700 whitespace-pre-wrap">
+      <p key={block.id || Math.random()} className="mt-4 leading-8 text-slate-350 whitespace-pre-wrap">
         {extractText(block.data?.text)}
       </p>
     );
@@ -46,9 +46,9 @@ const renderBlock = (block: any) => {
         <img
           src={block.data?.url}
           alt={altText}
-          className="w-full rounded-3xl border border-slate-200 object-cover"
+          className="w-full rounded-3xl border border-slate-800 object-cover"
         />
-        {altText ? <figcaption className="mt-2 text-sm text-slate-600">{altText}</figcaption> : null}
+        {altText ? <figcaption className="mt-2 text-sm text-slate-400">{altText}</figcaption> : null}
       </figure>
     );
   }
@@ -59,7 +59,7 @@ const renderBlock = (block: any) => {
         key={block.id || Math.random()}
         src={block.data?.url}
         controls
-        className="my-6 w-full rounded-3xl border border-slate-200"
+        className="my-6 w-full rounded-3xl border border-slate-800"
       >
         Your browser does not support the video tag.
       </video>
@@ -91,18 +91,18 @@ const parseContentBlocks = (content: any) => {
   return [];
 };
 
-export default async function AdminPostDetailPage({ params }: Props) {
+export default async function AuthorPostDetailPage({ params }: Props) {
   const resolvedParams = await params;
   const id = resolvedParams?.id === "undefined" ? undefined : resolvedParams?.id;
   if (!id) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-10 text-white">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-slate-950/40">
-          <Link href="/admin" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition">
-            ← Back to admin
+      <div className="px-6 py-10 text-white min-h-screen">
+        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/85 p-8 shadow-2xl">
+          <Link href="/dashboard" className="text-sm font-semibold text-emerald-400 hover:text-emerald-355 transition">
+            ← Back to Dashboard
           </Link>
           <h1 className="mt-6 text-3xl font-bold">Invalid blog link</h1>
-          <p className="mt-3 text-slate-400">This blog post link is invalid. Return to the admin dashboard and choose another post.</p>
+          <p className="mt-3 text-slate-400">This blog post link is invalid. Return to your dashboard and choose another post.</p>
         </div>
       </div>
     );
@@ -122,15 +122,15 @@ export default async function AdminPostDetailPage({ params }: Props) {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-10 text-white">
-        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-slate-950/40">
-          <Link href="/admin" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition">
-            ← Back to admin
+      <div className="px-6 py-10 text-white min-h-screen">
+        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-800 bg-slate-900/85 p-8 shadow-2xl">
+          <Link href="/dashboard/posts" className="text-sm font-semibold text-emerald-400 hover:text-emerald-355 transition">
+            ← Back to My Posts
           </Link>
           <h1 className="mt-6 text-3xl font-bold">Blog not found</h1>
-          <p className="mt-3 text-slate-400">We couldn’t load that blog post. Please return to the admin dashboard and try again.</p>
+          <p className="mt-3 text-slate-400">We couldn’t load that blog post. Please return to your posts archive and try again.</p>
           {error?.message ? (
-            <p className="mt-3 rounded-2xl bg-rose-900/20 border border-rose-700/30 p-4 text-sm text-rose-200">Error: {error.message}</p>
+            <p className="mt-3 rounded-2xl bg-rose-950/40 border border-rose-900/30 p-4 text-sm text-rose-350">Error: {error.message}</p>
           ) : null}
         </div>
       </div>
@@ -141,34 +141,32 @@ export default async function AdminPostDetailPage({ params }: Props) {
   const author = (Array.isArray(post.author) ? post.author[0] : post.author) as any;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-10 text-white">
+    <div className="px-6 py-10 text-white min-h-screen font-sans">
       <div className="mx-auto max-w-5xl space-y-8">
-        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl shadow-slate-950/40">
-          <Link href="/admin" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition">
-            ← Back to admin
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl">
+          <Link href="/dashboard/posts" className="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition">
+            ← Back to My Posts
           </Link>
           <div className="mt-6 space-y-3">
-            <p className="text-sm uppercase tracking-[0.24em] text-emerald-400">Admin preview</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-emerald-400 font-bold">Author preview</p>
             <h1 className="text-4xl font-bold">{post.title || "Untitled post"}</h1>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400 mt-3">
               {author ? (
-                <div className="flex items-center gap-3 rounded-full bg-slate-800 px-3 py-2">
+                <div className="flex items-center gap-3 rounded-full bg-slate-950/60 border border-slate-800 px-3 py-1.5">
                   <img
                     src={author.avatar_url || author.author_image_url || "/default-avatar.png"}
                     alt={author.full_name || author.username || "Author"}
-                    className="h-10 w-10 rounded-full object-cover border border-slate-700"
+                    className="h-8 w-8 rounded-full object-cover border border-slate-700"
                   />
-                  <span>{author.full_name || author.username || "Unknown author"}</span>
+                  <span className="font-semibold text-slate-205">{author.full_name || author.username || "Unknown author"}</span>
                 </div>
-              ) : (
-                <span>{author?.full_name || author?.username || "Unknown author"}</span>
-              )}
+              ) : null}
               <span className="h-1 w-1 rounded-full bg-slate-700" />
               <span>{post.published_at ? new Date(post.published_at).toLocaleDateString() : new Date(post.updated_at).toLocaleDateString()}</span>
               {post.status ? (
                 <>
                   <span className="h-1 w-1 rounded-full bg-slate-700" />
-                  <span className="rounded-full bg-slate-800 px-2 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  <span className="rounded-full bg-slate-850 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-emerald-400 border border-emerald-950/50">
                     {post.status}
                   </span>
                 </>
@@ -188,7 +186,7 @@ export default async function AdminPostDetailPage({ params }: Props) {
         ) : null}
 
         <article className="rounded-3xl border border-slate-800 bg-slate-900/80 p-8 shadow-2xl prose prose-invert max-w-none">
-          {post.excerpt ? <p className="text-slate-300">{post.excerpt}</p> : null}
+          {post.excerpt ? <p className="text-slate-300 text-lg leading-relaxed">{post.excerpt}</p> : null}
           {blocks.length > 0 ? (
             blocks.map((block: any) => renderBlock(block))
           ) : (

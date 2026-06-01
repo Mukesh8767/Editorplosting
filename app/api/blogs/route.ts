@@ -8,8 +8,32 @@ const normalizeBlog = (post: any) => {
     ? post.post_tags.map((item: any) => item.tags).filter(Boolean)
     : [];
   const tags = postTags.map((tag: any) => tag.title || tag.slug || "").filter(Boolean);
-  const { post_tags, ...rest } = post;
-  return { ...rest, tags };
+
+  const author = post.author
+    ? {
+        full_name: post.author.full_name ?? null,
+        username: post.author.username ?? null,
+        email: post.author.email ?? null,
+        avatar_url: post.author.avatar_url ?? null,
+        author_image_url: post.author.author_image_url ?? null,
+      }
+    : null;
+
+  const authorName = author?.full_name || author?.username || "Unknown author";
+  const authorImageUrl = author?.author_image_url || author?.avatar_url || null;
+  const authorAvatarUrl = author?.avatar_url || author?.author_image_url || null;
+
+  const { post_tags, created_at, updated_at, ...rest } = post;
+  return {
+    ...rest,
+    author,
+    authorName,
+    authorImageUrl,
+    authorAvatarUrl,
+    tags,
+    createdAt: created_at ?? rest.createdAt,
+    updatedAt: updated_at ?? rest.updatedAt,
+  };
 };
 
 export async function GET(request: NextRequest) {
@@ -49,7 +73,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(Array.isArray(data) ? data.map(normalizeBlog) : []);
 }
 
 export async function POST(request: NextRequest) {

@@ -21,6 +21,15 @@ export type Blog = {
   published_at?: string | null;
   authorId: string;
   authorName: string;
+  author?: {
+    full_name?: string | null;
+    username?: string | null;
+    email?: string | null;
+    avatar_url?: string | null;
+    author_image_url?: string | null;
+  } | null;
+  authorImageUrl?: string | null;
+  authorAvatarUrl?: string | null;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
@@ -45,7 +54,8 @@ const safeParse = <T>(value: string | null, fallback: T): T => {
 };
 
 const apiFetch = async (path: string, options?: RequestInit) => {
-  const res = await fetch(path, {
+  const url = typeof window !== "undefined" ? new URL(path, window.location.origin).toString() : path;
+  const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -79,7 +89,13 @@ export const createUser = async (
 ): Promise<User> => {
   return await apiFetch("/api/users", {
     method: "POST",
-    body: JSON.stringify({ username, displayName, password, authorImageUrl }),
+    body: JSON.stringify({
+      username,
+      displayName,
+      password,
+      authorImageUrl,
+      avatarUrl: authorImageUrl ?? null,
+    }),
   });
 };
 
@@ -183,6 +199,12 @@ export const updateUser = async (
 ): Promise<User> => {
   return await apiFetch("/api/users", {
     method: "PATCH",
-    body: JSON.stringify({ id, displayName, password, avatarUrl }),
+    body: JSON.stringify({
+      id,
+      displayName,
+      password,
+      avatarUrl,
+      authorImageUrl: avatarUrl ?? null,
+    }),
   });
 };
