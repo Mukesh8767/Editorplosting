@@ -128,21 +128,21 @@ export default function AdminPage() {
   const totalDrafts = blogs.filter((blog) => blog.status === "draft").length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
+      <div className="sticky top-0 z-40 rounded-2xl border border-white/70 bg-white/85 shadow-sm backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-white">Sustainability Studio</h1>
-            <p className="text-xs text-slate-400">Admin Dashboard</p>
+            <h1 className="text-2xl font-bold text-slate-950">Sustainability Studio</h1>
+            <p className="text-xs text-slate-500">Admin Dashboard</p>
           </div>
           <div className="flex items-center gap-4">
-            <span className="px-4 py-2 bg-slate-800 text-slate-200 rounded-lg text-sm font-semibold">
+            <span className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl text-sm font-semibold">
               {session?.displayName}
             </span>
             <button
               onClick={handleSignOut}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition"
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-semibold transition"
             >
               Sign out
             </button>
@@ -154,28 +154,28 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Metrics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-6 shadow-lg">
-            <p className="text-slate-400 text-sm font-semibold uppercase tracking-widest">Total Posts</p>
-            <p className="text-5xl font-bold text-white mt-4">{blogs.length}</p>
-            <p className="text-slate-400 text-sm mt-2">All articles in system</p>
+          <div className="studio-panel rounded-2xl p-6">
+            <p className="text-slate-500 text-sm font-semibold uppercase tracking-widest">Total Posts</p>
+            <p className="text-5xl font-bold text-slate-950 mt-4">{blogs.length}</p>
+            <p className="text-slate-500 text-sm mt-2">All articles in system</p>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-900/30 to-slate-900 border border-emerald-700/30 rounded-xl p-6 shadow-lg">
-            <p className="text-emerald-400 text-sm font-semibold uppercase tracking-widest">Published</p>
-            <p className="text-5xl font-bold text-emerald-400 mt-4">{totalPublished}</p>
-            <p className="text-slate-400 text-sm mt-2">Live on website</p>
+          <div className="studio-panel rounded-2xl p-6">
+            <p className="text-emerald-700 text-sm font-semibold uppercase tracking-widest">Published</p>
+            <p className="text-5xl font-bold text-emerald-700 mt-4">{totalPublished}</p>
+            <p className="text-slate-500 text-sm mt-2">Live on website</p>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-900/30 to-slate-900 border border-amber-700/30 rounded-xl p-6 shadow-lg">
-            <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest">Drafts</p>
-            <p className="text-5xl font-bold text-amber-400 mt-4">{totalDrafts}</p>
-            <p className="text-slate-400 text-sm mt-2">Being edited</p>
+          <div className="studio-panel rounded-2xl p-6">
+            <p className="text-amber-700 text-sm font-semibold uppercase tracking-widest">Drafts</p>
+            <p className="text-5xl font-bold text-amber-700 mt-4">{totalDrafts}</p>
+            <p className="text-slate-500 text-sm mt-2">Being edited</p>
           </div>
         </div>
 
         {/* Users Section (visible to admins only) */}
         {session?.role === "admin" && (
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-8 shadow-2xl">
+          <div className="studio-panel rounded-3xl p-8">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-3xl font-bold text-white">Author Users</h2>

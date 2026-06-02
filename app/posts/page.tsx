@@ -31,48 +31,56 @@ export default function PostsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 px-6 py-10">
-      {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-40 mb-8">
-        <div className="mx-auto max-w-5xl px-6 py-6">
-          <h1 className="text-4xl font-bold text-white">Articles</h1>
-          <p className="mt-2 text-slate-400">Latest published content from our authors</p>
-        </div>
-      </div>
+    <div className="app-shell min-h-screen px-5 py-10">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 rounded-3xl border border-white/70 bg-white/75 p-7 shadow-xl backdrop-blur sm:p-10">
+          <p className="text-sm uppercase tracking-[0.22em] text-emerald-700">Sustainability Journal</p>
+          <h1 className="responsive-heading mt-3 text-5xl font-bold text-slate-950">Articles</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">Latest published content from our authors.</p>
+        </header>
 
-      <div className="mx-auto max-w-5xl">
         {posts.length === 0 ? (
-          <div className="text-center py-12 bg-slate-900/50 border border-slate-800 rounded-2xl">
-            <p className="text-slate-400 text-lg">No articles published yet</p>
+          <div className="studio-panel rounded-3xl p-10 text-center">
+            <p className="text-lg font-medium text-slate-600">No articles published yet.</p>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-5">
             {posts.map((p) => (
-              <article key={p.id} className="rounded-xl border border-slate-800 bg-gradient-to-br from-slate-800/30 to-slate-900/30 p-6 hover:border-emerald-500/50 transition group">
-                <h2 className="text-2xl font-bold text-white group-hover:text-emerald-400 transition">
-                  <Link href={`/blog/${p.slug}`}>{p.title}</Link>
-                </h2>
-                {p.tags?.length ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {p.tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-xs font-semibold text-emerald-400">
-                        {tag}
-                      </span>
-                    ))}
+              <article key={p.id} className="subtle-card grid overflow-hidden rounded-2xl transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-xl md:grid-cols-[220px_1fr]">
+                <div className="min-h-48 bg-slate-100 md:min-h-full">
+                  {p.cover_image_url ? (
+                    <img src={p.cover_image_url} alt={p.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="grid h-full min-h-48 place-items-center bg-emerald-50 text-sm font-semibold text-emerald-700">Article</div>
+                  )}
+                </div>
+
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-slate-950 transition hover:text-emerald-700">
+                    <Link href={`/blog/${p.slug}`}>{p.title}</Link>
+                  </h2>
+                  {p.tags?.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {p.tags.map((tag) => (
+                        <span key={tag} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <p className="mt-3 line-clamp-2 text-slate-600">{p.excerpt}</p>
+                  <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
+                    <img
+                      src={p.author?.avatar_url || p.author?.author_image_url || "/default-avatar.png"}
+                      alt={p.author?.full_name || p.author?.username || "Author"}
+                      className="h-9 w-9 rounded-full border border-slate-200 object-cover"
+                    />
+                    <span className="font-semibold text-slate-700">
+                      {p.author?.full_name || p.author?.username || p.authorName || "Unknown author"}
+                    </span>
+                    <span>•</span>
+                    <span>{p.published_at ? new Date(p.published_at).toLocaleDateString() : ""}</span>
                   </div>
-                ) : null}
-                <p className="mt-3 text-slate-400 line-clamp-2">{p.excerpt}</p>
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                  <img
-                    src={p.author?.avatar_url || p.author?.author_image_url || "/default-avatar.png"}
-                    alt={p.author?.full_name || p.author?.username || "Author"}
-                    className="h-8 w-8 rounded-full object-cover border border-slate-700"
-                  />
-                  <span className="text-slate-300">
-                    {p.author?.full_name || p.author?.username || p.authorName || "Unknown author"}
-                  </span>
-                  <span className="text-slate-500">•</span>
-                  <span>{p.published_at ? new Date(p.published_at).toLocaleDateString() : ""}</span>
                 </div>
               </article>
             ))}

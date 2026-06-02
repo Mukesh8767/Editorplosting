@@ -1,5 +1,5 @@
 export const config = {
-  supabaseUrl: process.env.SUPABASE_URL ?? "",
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "",
   supabaseAnonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
   supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",

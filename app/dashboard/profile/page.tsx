@@ -7,7 +7,9 @@ import { clearSession, getSession, setSession, type User } from "@/lib/blog-stor
 export default function AuthorProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [displayName, setDisplayName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -38,10 +40,6 @@ export default function AuthorProfilePage() {
       avatarUrl: avatarUrl ?? null,
     };
 
-    if (newPassword.trim()) {
-      payload.password = newPassword.trim();
-    }
-
     const res = await fetch("/api/users", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -61,8 +59,70 @@ export default function AuthorProfilePage() {
     };
     setUser(updatedUser);
     setSession(updatedUser);
-    setNewPassword("");
     setMessage("Profile updated successfully.");
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleChangePassword = async () => {
+    if (!user) return;
+    setMessage("");
+    setError("");
+
+    if (!currentPassword || !newPassword) {
+      setError("Current password and new password are required.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("New password must be at least 6 characters.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("New password and confirmation do not match.");
+      return;
+    }
+
+    const res = await fetch("/api/password/change", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: user.id,
+        email: user.username,
+        currentPassword,
+        newPassword,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data?.error || "Unable to change password.");
+      return;
+    }
+
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setMessage(data?.message || "Password changed successfully.");
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  const handleSendResetEmail = async () => {
+    if (!user?.username) return;
+    setMessage("");
+    setError("");
+
+    const res = await fetch("/api/password/forgot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.username }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data?.error || "Unable to send reset email.");
+      return;
+    }
+    setMessage(data?.message || "Password reset email sent.");
     setTimeout(() => setMessage(""), 3000);
   };
 
@@ -154,15 +214,60 @@ export default function AuthorProfilePage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-205">New Password</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  placeholder="Leave blank to keep current password"
-                  className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-550 outline-none focus:border-emerald-500 transition text-sm"
-                />
+              <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-5">
+                <h2 className="text-lg font-bold text-white">Password security</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Change your password by confirming the current password, or send yourself a Supabase reset email.
+                </p>
+
+                <div className="mt-5 grid gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-205">Current Password</label>
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(event) => setCurrentPassword(event.target.value)}
+                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-205">New Password</label>
+                    <input
+                      type="password"
+                      value={newPassword}
+                      onChange={(event) => setNewPassword(event.target.value)}
+                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-205">Confirm New Password</label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                    />
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={handleChangePassword}
+                      className="rounded-lg bg-emerald-500 px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-emerald-600"
+                    >
+                      Change Password
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSendResetEmail}
+                      className="rounded-lg border border-slate-700 bg-slate-800 px-5 py-3 text-sm font-bold text-slate-200 transition hover:border-emerald-500 hover:text-white"
+                    >
+                      Send Reset Email
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div>

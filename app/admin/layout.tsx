@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { getSession } from "@/lib/blog-store";
 
@@ -15,12 +15,7 @@ const baseNav = [
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const [sessionRole, setSessionRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    const s = getSession();
-    if (s) setSessionRole(s.role ?? null);
-  }, []);
+  const [sessionRole] = useState<string | null>(() => getSession()?.role ?? null);
 
   const navItems = baseNav.map((item) => {
     if (item.href === "/admin/posts" && sessionRole !== "admin") {
@@ -30,35 +25,35 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   });
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto flex min-h-screen max-w-420">
-        <aside className="hidden w-80 shrink-0 flex-col border-r border-slate-200 bg-slate-950 text-white lg:flex">
-          <div className="flex h-24 items-center border-b border-slate-800 px-8">
+    <div className="admin-surface text-slate-900">
+      <div className="mx-auto flex min-h-screen max-w-[1800px]">
+        <aside className="sticky top-0 hidden h-screen w-76 shrink-0 flex-col border-r border-slate-200/80 bg-slate-950 text-white shadow-2xl lg:flex">
+          <div className="flex h-24 items-center border-b border-white/10 px-7">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Sustainability</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-emerald-300">Sustainability</p>
               <h1 className="mt-2 text-2xl font-semibold text-white">Editor Studio</h1>
             </div>
           </div>
 
-          <nav className="flex-1 space-y-2 px-4 py-8">
+          <nav className="flex-1 space-y-1.5 px-4 py-7">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block rounded-3xl px-5 py-4 text-sm font-semibold text-slate-200 transition hover:bg-slate-800 hover:text-white"
+                className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
               >
                 {item.label}
               </Link>
             ))}
           </nav>
 
-          <div className="border-t border-slate-800 px-6 py-6">
-            <div className="rounded-3xl border border-slate-800 bg-slate-900 p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Need help?</p>
+          <div className="border-t border-white/10 px-5 py-5">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Workspace</p>
               <p className="mt-3 text-sm font-semibold text-white">Use the left menu to create posts, manage categories, and review blogs.</p>
               <Link
                 href="/login"
-                className="mt-4 inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
+                className="btn-primary mt-4 inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold"
               >
                 Go to login
               </Link>
@@ -66,8 +61,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-350">{children}</div>
+        <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white/80 p-2 shadow-sm lg:hidden">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href} className="shrink-0 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+          <div className="mx-auto max-w-[1360px]">{children}</div>
         </main>
       </div>
     </div>
