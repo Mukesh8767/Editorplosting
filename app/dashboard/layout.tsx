@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { getSession } from "@/lib/blog-store";
 
 const baseNav = [
@@ -11,6 +11,7 @@ const baseNav = [
   { label: "My Posts", href: "/dashboard/posts" },
   { label: "Create Post", href: "/dashboard/posts/create" },
   { label: "Categories", href: "/dashboard/topics" },
+  { label: "Events", href: "/dashboard/events" },
   { label: "Brochures", href: "/dashboard/brochures" },
   { label: "Profile", href: "/dashboard/profile" },
 ];
@@ -18,6 +19,7 @@ const baseNav = [
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [verified, setVerified] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const s = getSession();
@@ -44,15 +46,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
 
           <nav className="flex-1 space-y-1.5 px-4 py-7">
-            {baseNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block rounded-xl px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {baseNav.map((item) => {
+              const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                      : "text-slate-300 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="border-t border-white/10 px-5 py-5">
@@ -71,11 +80,22 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8">
           <div className="mb-5 flex gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-white/80 p-2 shadow-sm lg:hidden">
-            {baseNav.map((item) => (
-              <Link key={item.href} href={item.href} className="shrink-0 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-700">
-                {item.label}
-              </Link>
-            ))}
+            {baseNav.map((item) => {
+              const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`shrink-0 rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
           <div className="mx-auto max-w-[1360px]">{children}</div>
         </main>

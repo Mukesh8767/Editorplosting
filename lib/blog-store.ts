@@ -42,7 +42,45 @@ export type Topic = {
   slug?: string;
 };
 
+export type EventImage = {
+  id?: string;
+  event_id?: string;
+  image_url: string;
+  display_order?: number;
+  created_at?: string;
+};
+
+export type Event = {
+  id: string;
+  title: string;
+  description?: string | null;
+  event_type?: string | null;
+  start_date: string;
+  end_date?: string | null;
+  location?: string | null;
+  organizer?: string | null;
+  registration_url?: string | null;
+  cover_image_url?: string | null;
+  is_featured?: boolean;
+  created_by?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  event_images?: EventImage[];
+};
+
 const SESSION_KEY = "blogAppSession";
+
+let blogsCache: Blog[] | null = null;
+let topicsCache: Topic[] | null = null;
+let usersCache: User[] | null = null;
+let userBlogsCache: { [userId: string]: Blog[] } = {};
+
+export const clearCache = () => {
+  blogsCache = null;
+  topicsCache = null;
+  usersCache = null;
+  userBlogsCache = {};
+};
 
 const safeParse = <T>(value: string | null, fallback: T): T => {
   if (!value) return fallback;
@@ -87,7 +125,7 @@ export const createUser = async (
   password: string,
   authorImageUrl?: string | null
 ): Promise<User> => {
-  return await apiFetch("/api/users", {
+  const data = await apiFetch("/api/users", {
     method: "POST",
     body: JSON.stringify({
       username,
@@ -97,10 +135,22 @@ export const createUser = async (
       avatarUrl: authorImageUrl ?? null,
     }),
   });
+  clearCache();
+  return data;
 };
 
-export const getUsers = async (): Promise<User[]> => {
-  return await apiFetch("/api/users");
+export const getUsers = async (bypassCache = false): Promise<User[]> => {
+  if (usersCache && !bypassCache) {
+    apiFetch("/api/users")
+      .then((data) => {
+        usersCache = data;
+      })
+      .catch(() => {});
+    return usersCache;
+  }
+  const data = await apiFetch("/api/users");
+  usersCache = data;
+  return data;
 };
 
 export const getSession = (): User | null => {
@@ -118,16 +168,46 @@ export const clearSession = () => {
   window.sessionStorage.removeItem(SESSION_KEY);
 };
 
-export const getAllBlogs = async (): Promise<Blog[]> => {
-  return await apiFetch("/api/blogs");
+export const getAllBlogs = async (bypassCache = false): Promise<Blog[]> => {
+  if (blogsCache && !bypassCache) {
+    apiFetch("/api/blogs")
+      .then((data) => {
+        blogsCache = data;
+      })
+      .catch(() => {});
+    return blogsCache;
+  }
+  const data = await apiFetch("/api/blogs");
+  blogsCache = data;
+  return data;
 };
 
-export const getTopics = async (): Promise<Topic[]> => {
-  return await apiFetch("/api/topics");
+export const getTopics = async (bypassCache = false): Promise<Topic[]> => {
+  if (topicsCache && !bypassCache) {
+    apiFetch("/api/topics")
+      .then((data) => {
+        topicsCache = data;
+      })
+      .catch(() => {});
+    return topicsCache;
+  }
+  const data = await apiFetch("/api/topics");
+  topicsCache = data;
+  return data;
 };
 
-export const getUserBlogs = async (userId: string): Promise<Blog[]> => {
-  return await apiFetch(`/api/blogs?userId=${encodeURIComponent(userId)}`);
+export const getUserBlogs = async (userId: string, bypassCache = false): Promise<Blog[]> => {
+  if (userBlogsCache[userId] && !bypassCache) {
+    apiFetch(`/api/blogs?userId=${encodeURIComponent(userId)}`)
+      .then((data) => {
+        userBlogsCache[userId] = data;
+      })
+      .catch(() => {});
+    return userBlogsCache[userId];
+  }
+  const data = await apiFetch(`/api/blogs?userId=${encodeURIComponent(userId)}`);
+  userBlogsCache[userId] = data;
+  return data;
 };
 
 export const getBlogById = async (id: string): Promise<Blog | null> => {
@@ -154,7 +234,7 @@ export const createBlog = async (
     published_at?: string | null;
   }
 ): Promise<Blog> => {
-  return await apiFetch("/api/blogs", {
+  const data = await apiFetch("/api/blogs", {
     method: "POST",
     body: JSON.stringify({
       title,
@@ -176,12 +256,15 @@ export const createBlog = async (
       tags: options?.tags,
     }),
   });
+  clearCache();
+  return data;
 };
 
 export const deleteBlog = async (id: string): Promise<void> => {
   await apiFetch(`/api/blogs?id=${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
+  clearCache();
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
@@ -189,6 +272,7 @@ export const deleteUser = async (id: string): Promise<void> => {
     method: "DELETE",
     body: JSON.stringify({ id }),
   });
+  clearCache();
 };
 
 export const updateUser = async (
@@ -197,7 +281,7 @@ export const updateUser = async (
   password?: string,
   avatarUrl?: string | null
 ): Promise<User> => {
-  return await apiFetch("/api/users", {
+  const data = await apiFetch("/api/users", {
     method: "PATCH",
     body: JSON.stringify({
       id,
@@ -206,5 +290,31 @@ export const updateUser = async (
       avatarUrl,
       authorImageUrl: avatarUrl ?? null,
     }),
+  });
+  clearCache();
+  return data;
+};
+
+export const getEvents = async (options?: { userId?: string; featured?: boolean }): Promise<Event[]> => {
+  let url = "/api/events";
+  const params = new URLSearchParams();
+  if (options?.userId) params.append("userId", options.userId);
+  if (options?.featured) params.append("featured", "true");
+  if (params.toString()) url += `?${params.toString()}`;
+  return await apiFetch(url);
+};
+
+export const createEvent = async (
+  payload: Omit<Event, "id" | "created_at" | "updated_at"> & { id?: string }
+): Promise<Event> => {
+  return await apiFetch("/api/events", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};
+
+export const deleteEvent = async (id: string): Promise<void> => {
+  await apiFetch(`/api/events?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
   });
 };

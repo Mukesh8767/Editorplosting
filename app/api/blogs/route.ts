@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "../../../lib/supabase-client";
+import { revalidatePath } from "next/cache";
 
 const postSelect = `id, title, content, excerpt, slug, topic_id, status, reading_time, is_featured, cover_image_url, seo_title, seo_description, canonical_url, published_at, views_count, author_id, created_at, updated_at, author:profiles!author_id(full_name, username, email, avatar_url, author_image_url), post_tags(tags(id, title, slug))`;
+const postListSelect = `id, title, excerpt, slug, topic_id, status, reading_time, is_featured, cover_image_url, seo_title, seo_description, canonical_url, published_at, views_count, author_id, created_at, updated_at, author:profiles!author_id(full_name, username, email, avatar_url, author_image_url), post_tags(tags(id, title, slug))`;
 
 const normalizeBlog = (post: any) => {
   const postTags = Array.isArray(post.post_tags)
@@ -42,7 +44,12 @@ export async function GET(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get("slug");
 
   const supabaseAdmin = getSupabaseAdmin();
-  const baseQuery = supabaseAdmin.from("posts").select(postSelect).order("updated_at", { ascending: false });
+  let baseQuery;
+  if (blogId || slug) {
+    baseQuery = supabaseAdmin.from("posts").select(postSelect).order("updated_at", { ascending: false });
+  } else {
+    baseQuery = supabaseAdmin.from("posts").select(postListSelect).order("updated_at", { ascending: false });
+  }
 
   if (blogId) {
     const { data, error } = await baseQuery.eq("id", blogId).single();
@@ -193,6 +200,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (refreshedError) return NextResponse.json({ error: refreshedError.message }, { status: 500 });
+
+    revalidatePath("/posts");
+    revalidatePath("/blog/[slug]");
+    if (refreshedPost?.slug) {
+      revalidatePath(`/blog/${refreshedPost.slug}`);
+    }
+
     return NextResponse.json(refreshedPost ? normalizeBlog(refreshedPost) : null);
   }
 
@@ -217,6 +231,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (refreshedError) return NextResponse.json({ error: refreshedError.message }, { status: 500 });
+
+  revalidatePath("/posts");
+  revalidatePath("/blog/[slug]");
+  if (refreshedPost?.slug) {
+    revalidatePath(`/blog/${refreshedPost.slug}`);
+  }
+
   return NextResponse.json(refreshedPost ? normalizeBlog(refreshedPost) : null);
 }
 
@@ -231,6 +252,9 @@ export async function DELETE(request: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  revalidatePath("/posts");
+  revalidatePath("/blog/[slug]");
 
   return NextResponse.json({ success: true });
 }

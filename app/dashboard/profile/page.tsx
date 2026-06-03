@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearSession, getSession, setSession, type User } from "@/lib/blog-store";
+import { getSupabaseClient } from "@/lib/supabase-client";
 
 export default function AuthorProfilePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -130,17 +131,12 @@ export default function AuthorProfilePage() {
     setUploading(true);
     setError("");
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload-author-photo", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Upload failed.");
-      }
-      setAvatarUrl(data.url || null);
+      const supabase = getSupabaseClient();
+      const path = `avatars/${Date.now()}-${file.name}`;
+      const { data, error: uploadError } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
+      setAvatarUrl(urlData.publicUrl || null);
     } catch (err: any) {
       setError(err?.message || "Upload failed.");
     } finally {

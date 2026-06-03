@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import BlockEditor, { type Block } from "@/app/admin/posts/BlockEditor";
 import { getTopics, getSession } from "@/lib/blog-store";
+import { getSupabaseClient } from "@/lib/supabase-client";
 
 const renderBlock = (block: any) => {
   if (!block || typeof block !== "object") return null;
@@ -362,15 +363,12 @@ export default function AuthorCreatePostPage() {
                       if (!f) return;
                       setUploadingCover(true);
                       try {
-                        const form = new FormData();
-                        form.append("file", f);
-                        const res = await fetch("/api/upload-media", { method: "POST", body: form });
-                        const json = await res.json();
-                        if (res.ok && json?.url) {
-                          setCoverImageUrl(json.url);
-                        } else {
-                          setMessage(json?.error || "Upload failed.");
-                        }
+                        const supabase = getSupabaseClient();
+                        const path = `covers/${Date.now()}-${f.name}`;
+                        const { data, error } = await supabase.storage.from("post-uploads").upload(path, f, { upsert: true });
+                        if (error) throw error;
+                        const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
+                        setCoverImageUrl(urlData.publicUrl);
                       } catch (err: any) {
                         setMessage(err?.message || "Upload failed.");
                       } finally {
@@ -421,15 +419,12 @@ export default function AuthorCreatePostPage() {
                         if (!file) return;
                         setUploadingCover(true);
                         try {
-                          const form = new FormData();
-                          form.append("file", file);
-                          const res = await fetch("/api/upload-media", { method: "POST", body: form });
-                          const json = await res.json();
-                          if (res.ok && json?.url) {
-                            setCanonicalUrl(json.url);
-                          } else {
-                            setMessage(json?.error || "Upload failed.");
-                          }
+                          const supabase = getSupabaseClient();
+                          const path = `canonicals/${Date.now()}-${file.name}`;
+                          const { data, error } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
+                          if (error) throw error;
+                          const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
+                          setCanonicalUrl(urlData.publicUrl);
                         } catch (err: any) {
                           setMessage(err?.message || "Upload failed.");
                         } finally {

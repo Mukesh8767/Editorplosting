@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSession, type User } from "@/lib/blog-store";
+import { getSupabaseClient } from "@/lib/supabase-client";
 
 type Brochure = {
   id: string;
@@ -88,6 +89,21 @@ export default function AuthorBrochuresPage() {
       return;
     }
 
+    let pdfUrlToSubmit = currentPdfUrl;
+    if (pdfFile) {
+      try {
+        const supabase = getSupabaseClient();
+        const path = `brochures/${Date.now()}-${pdfFile.name}`;
+        const { data, error: uploadError } = await supabase.storage.from("post-uploads").upload(path, pdfFile, { upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
+        pdfUrlToSubmit = urlData.publicUrl;
+      } catch (err: any) {
+        setError(err?.message || "File upload to storage failed.");
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append("title", title.trim());
     formData.append("description", description.trim());
@@ -96,10 +112,8 @@ export default function AuthorBrochuresPage() {
       formData.append("uploaded_by", session.id);
     }
 
-    if (pdfFile) {
-      formData.append("file", pdfFile);
-    } else if (currentPdfUrl) {
-      formData.append("pdf_url", currentPdfUrl);
+    if (pdfUrlToSubmit) {
+      formData.append("pdf_url", pdfUrlToSubmit);
     }
 
     if (editingId) {

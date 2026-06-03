@@ -85,13 +85,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Title is required." }, { status: 400 });
   }
 
-  if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
-    return NextResponse.json({ error: "Cloudinary is not configured." }, { status: 500 });
-  }
-
   let pdf_url = pdfUrlFromForm;
 
   if (fileValue && isFileObject(fileValue)) {
+    if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
+      return NextResponse.json({ error: "Cloudinary is not configured." }, { status: 500 });
+    }
     try {
       pdf_url = await uploadToCloudinary(fileValue);
     } catch (uploadError: any) {
