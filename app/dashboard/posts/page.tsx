@@ -64,147 +64,109 @@ export default function AuthorPostsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-slate-400">
-        Loading posts...
-      </div>
-    );
+    return <div className="flex min-h-screen items-center justify-center text-slate-500">Loading posts...</div>;
   }
 
   return (
-    <div className="px-6 py-10 text-white min-h-screen font-sans">
-      <header className="rounded-2xl border border-slate-800 bg-slate-950/80 backdrop-blur p-8 shadow-xl mb-8">
+    <div className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
+      <header className="mb-6 rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.32em] text-emerald-400 font-bold">Manage Content</p>
-            <h1 className="mt-3 text-4xl font-bold text-white font-sans">My Blog Posts</h1>
-            <p className="mt-2 max-w-2xl text-base leading-7 text-slate-400">
-              Browse, view, edit, or delete the articles you have created. You can see only your own articles.
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-emerald-700">Manage content</p>
+            <h1 className="mt-2 text-3xl font-medium tracking-tight text-slate-950">My Blog Posts</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Browse, preview, edit, or delete the articles you have created.
             </p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center rounded-lg bg-slate-800 hover:bg-slate-700 px-5 py-3 text-sm font-semibold text-white transition border border-slate-700"
-            >
-              ← Back to Overview
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/dashboard" className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+              Back to Overview
             </Link>
-            <Link
-              href="/dashboard/posts/create"
-              className="inline-flex items-center rounded-lg bg-emerald-500 hover:bg-emerald-600 px-5 py-3 text-sm font-semibold text-slate-950 transition font-bold shadow-lg"
-            >
-              + Create New Post
+            <Link href="/dashboard/posts/create" className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800">
+              Create New Post
             </Link>
           </div>
         </div>
       </header>
 
-      {message && (
-        <div className="mb-6 p-4 bg-emerald-900/30 border border-emerald-700 rounded-xl text-emerald-300 text-sm">
-          ✓ {message}
+      {message ? (
+        <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+          {message}
         </div>
-      )}
+      ) : null}
 
-      <section className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 shadow-xl">
-        <div className="flex justify-between items-center pb-6 border-b border-slate-850 mb-6">
-          <h2 className="text-2xl font-bold text-white font-sans">Articles</h2>
-          <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 text-sm font-semibold text-emerald-400">
+      <section className="rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm">
+        <div className="mb-6 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-medium text-slate-950">Articles</h2>
+            <p className="mt-1 text-sm text-slate-600">A clean overview of your drafts and published posts.</p>
+          </div>
+          <span className="w-fit rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-800">
             {posts.length} {posts.length === 1 ? "Post" : "Posts"}
           </span>
         </div>
 
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {posts.length === 0 ? (
-            <div className="col-span-full py-16 text-center border border-dashed border-slate-800 rounded-2xl bg-slate-950/20">
-              <p className="text-slate-500 text-lg mb-4">No posts written yet. Start your first article now!</p>
-              <Link
-                href="/dashboard/posts/create"
-                className="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-slate-950 rounded-lg font-bold transition inline-block text-sm"
-              >
-                Write Post
-              </Link>
-            </div>
-          ) : (
-            posts.map((post) => {
+        {posts.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
+            <p className="text-sm text-slate-600">No posts written yet. Start your first article now.</p>
+            <Link href="/dashboard/posts/create" className="mt-4 inline-flex rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-800">
+              Write Post
+            </Link>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {posts.map((post) => {
               const topic = topics.find((t) => t.id === post.topic_id);
               const publishedDate = post.published_at
                 ? new Date(post.published_at)
-                : new Date(post.createdAt || Date.now());
+                : new Date(post.createdAt || post.updatedAt);
 
               return (
-                <div
-                  key={post.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/40 shadow-lg hover:border-emerald-500/40 hover:bg-slate-950/70 transition duration-350"
-                >
-                  <div className="relative h-40 overflow-hidden bg-slate-850">
+                <article key={post.id} className="flex min-h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+                  <div className="relative h-40 overflow-hidden bg-slate-100">
                     {post.cover_image_url ? (
-                      <img
-                        src={post.cover_image_url}
-                        alt={post.title || "Post cover"}
-                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                      />
+                      <img src={post.cover_image_url} alt={post.title || "Post cover"} className="h-full w-full object-cover" />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-slate-600 text-sm font-semibold bg-slate-900">
-                        No cover image
-                      </div>
+                      <div className="grid h-full w-full place-items-center text-sm text-slate-500">No cover image</div>
                     )}
                   </div>
 
-                  <div className="flex-1 flex flex-col p-5 justify-between">
-                    <div>
-                      {/* Topic & Status Tag */}
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {topic && (
-                          <span className="rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 text-xs text-emerald-400 font-medium">
-                            {topic.title}
-                          </span>
-                        )}
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                            post.status === "published"
-                              ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-400"
-                              : "bg-amber-500/10 border border-amber-500/25 text-amber-400"
-                          }`}
-                        >
-                          {post.status?.charAt(0).toUpperCase()}{post.status?.slice(1)}
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {topic ? (
+                        <span className="rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-800">
+                          {topic.title}
                         </span>
-                      </div>
-
-                      <h3 className="text-lg font-bold text-white line-clamp-2 leading-snug mb-2 hover:text-emerald-400 transition cursor-pointer">
-                        {post.title || "Untitled"}
-                      </h3>
-                      <p className="text-xs text-slate-400 mb-4">
-                        Updated {publishedDate.toLocaleDateString()}
-                      </p>
+                      ) : null}
+                      <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${
+                        post.status === "published"
+                          ? "border-emerald-100 bg-emerald-50 text-emerald-800"
+                          : "border-amber-100 bg-amber-50 text-amber-800"
+                      }`}>
+                        {post.status?.charAt(0).toUpperCase()}{post.status?.slice(1)}
+                      </span>
                     </div>
 
-                    <div className="flex gap-2 pt-4 border-t border-slate-850">
-                      <Link
-                        href={`/dashboard/posts/${encodeURIComponent(post.slug ?? post.id)}`}
-                        className="flex-1 text-center py-2 bg-slate-800 hover:bg-slate-750 text-slate-350 rounded-lg text-xs font-bold transition border border-slate-700"
-                      >
+                    <h3 className="line-clamp-2 text-lg font-medium leading-snug text-slate-950">{post.title || "Untitled"}</h3>
+                    <p className="mt-2 text-xs text-slate-500">Updated {publishedDate.toLocaleDateString()}</p>
+
+                    <div className="mt-auto flex gap-2 border-t border-slate-100 pt-4">
+                      <Link href={`/dashboard/posts/${encodeURIComponent(post.slug ?? post.id)}`} className="flex-1 rounded-lg border border-slate-200 py-2 text-center text-xs font-medium text-slate-700 hover:bg-slate-50">
                         View
                       </Link>
-                      <Link
-                        href={`/dashboard/posts/create?id=${encodeURIComponent(post.id)}`}
-                        className="flex-1 text-center py-2 bg-emerald-600/10 hover:bg-emerald-600/25 text-emerald-400 border border-emerald-700/20 rounded-lg text-xs font-bold transition"
-                      >
+                      <Link href={`/dashboard/posts/create?id=${encodeURIComponent(post.id)}`} className="flex-1 rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-center text-xs font-medium text-emerald-800 hover:bg-emerald-100">
                         Edit
                       </Link>
-                      <button
-                        onClick={() => handleDelete(post.id)}
-                        className="p-2 bg-rose-600/10 hover:bg-rose-600/25 text-rose-450 border border-rose-700/20 rounded-lg transition"
-                        title="Delete Post"
-                      >
-                        🗑
+                      <button onClick={() => handleDelete(post.id)} className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 hover:bg-rose-100" title="Delete Post">
+                        Delete
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
       </section>
     </div>
   );

@@ -193,7 +193,7 @@ export default function AuthorProfilePage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-205">Display Name</label>
+                <label className="block text-sm font-semibold text-slate-900">Display Name</label>
                 <input
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
@@ -202,7 +202,7 @@ export default function AuthorProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-205">Email / Username (read-only)</label>
+                <label className="block text-sm font-semibold text-slate-900">Email / Username (read-only)</label>
                 <input
                   value={user?.username ?? ""}
                   readOnly
@@ -218,7 +218,7 @@ export default function AuthorProfilePage() {
 
                 <div className="mt-5 grid gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-205">Current Password</label>
+                    <label className="block text-sm font-semibold text-slate-900">Current Password</label>
                     <input
                       type="password"
                       value={currentPassword}
@@ -228,7 +228,7 @@ export default function AuthorProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-205">New Password</label>
+                    <label className="block text-sm font-semibold text-slate-900">New Password</label>
                     <input
                       type="password"
                       value={newPassword}
@@ -238,7 +238,7 @@ export default function AuthorProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-205">Confirm New Password</label>
+                    <label className="block text-sm font-semibold text-slate-900">Confirm New Password</label>
                     <input
                       type="password"
                       value={confirmPassword}
@@ -267,7 +267,7 @@ export default function AuthorProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-205">Profile Photo</label>
+                <label className="block text-sm font-semibold text-slate-900">Profile Photo</label>
                 <div className="mt-3 flex items-center gap-4">
                   <input
                     type="file"

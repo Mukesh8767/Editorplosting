@@ -226,19 +226,19 @@ export default function AuthorCreatePostPage() {
   }
 
   return (
-    <div className="px-4 py-8 sm:px-6 lg:px-8 text-white min-h-screen font-sans">
+    <div className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
         {/* Top Header Card */}
-        <div className="mb-8 rounded-[40px] border border-slate-800 bg-slate-900/50 p-6 shadow-xl sm:p-8">
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.32em] text-emerald-400 font-bold">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-emerald-700">
                 {postId ? "Edit Post" : "Create Post"}
               </p>
-              <h1 className="mt-3 text-3xl font-bold text-white">
+              <h1 className="mt-2 text-3xl font-medium tracking-tight text-slate-950">
                 {postId ? "Edit blog post" : "New blog post"}
               </h1>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
+              <p className="mt-2 text-sm leading-6 text-slate-600">
                 Update the article metadata in the form, and craft your story using the block editor and live preview side-by-side.
               </p>
             </div>
@@ -246,7 +246,7 @@ export default function AuthorCreatePostPage() {
               <button
                 type="button"
                 onClick={() => router.push("/dashboard/posts")}
-                className="inline-flex items-center rounded-full border border-slate-700 bg-slate-800 hover:bg-slate-700 px-5 py-3 text-sm font-semibold text-white transition"
+                className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 Back
               </button>
@@ -254,7 +254,7 @@ export default function AuthorCreatePostPage() {
                 type="button"
                 onClick={() => handleSave(false)}
                 disabled={loading}
-                className="inline-flex items-center rounded-full bg-slate-950 hover:bg-slate-850 border border-slate-750 px-5 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Save draft
               </button>
@@ -262,7 +262,7 @@ export default function AuthorCreatePostPage() {
                 type="button"
                 onClick={() => handleSave(true)}
                 disabled={loading}
-                className="inline-flex items-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-500 transition disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-emerald-700/20"
+                className="inline-flex items-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Publish
               </button>
@@ -270,59 +270,59 @@ export default function AuthorCreatePostPage() {
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-450">Logged in as</p>
-              <p className="mt-1 text-base font-semibold text-emerald-400">{authorName || "Unknown user"}</p>
+              <p className="text-sm font-medium text-slate-600">Logged in as</p>
+              <p className="mt-1 text-base font-medium text-slate-950">{authorName || "Unknown user"}</p>
             </div>
             {message ? (
-              <div className="rounded-2xl bg-emerald-950/60 border border-emerald-800 px-4 py-3 text-sm text-emerald-350">{message}</div>
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</div>
             ) : null}
           </div>
         </div>
 
         {/* Form Inputs Grid */}
         <div className="mx-auto max-w-5xl space-y-6">
-          <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
+          <div className="rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm">
             <div className="grid gap-4 xl:grid-cols-3">
               <div className="xl:col-span-3">
-                <label className="block text-sm font-semibold text-slate-200">Title</label>
+                <label className="block text-sm font-medium text-slate-700">Title</label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-lg font-bold text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-lg font-medium text-slate-950 outline-none"
                   placeholder="The title of your article"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Excerpt</label>
+                <label className="block text-sm font-medium text-slate-700">Excerpt</label>
                 <input
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                   placeholder="Short summarizing description"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Tags</label>
+                <label className="block text-sm font-medium text-slate-700">Tags</label>
                 <input
                   value={tagsInput}
                   onChange={(e) => setTagsInput(e.target.value)}
                   placeholder="e.g. Energy, Solar, Green"
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                 />
                 <p className="mt-2 text-xs text-slate-500">Separate tags with commas. New tags are created automatically.</p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Category</label>
+                <label className="block text-sm font-medium text-slate-700">Category</label>
                 <select
                   value={topicId ?? ""}
                   onChange={(e) => {
                     setTopicId(e.target.value || null);
                     setSubtopicId(null);
                   }}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                 >
                   <option value="">Select category</option>
                   {topics.filter((t) => !t.parent_id).map((t) => (
@@ -332,12 +332,12 @@ export default function AuthorCreatePostPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Subcategory</label>
+                <label className="block text-sm font-medium text-slate-700">Subcategory</label>
                 <select
                   value={subtopicId ?? ""}
                   onChange={(e) => setSubtopicId(e.target.value || null)}
                   disabled={subCategories.length === 0}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition disabled:cursor-not-allowed disabled:bg-slate-900"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none disabled:cursor-not-allowed disabled:bg-slate-100"
                 >
                   {subCategories.length > 0 ? (
                     <>
@@ -353,7 +353,7 @@ export default function AuthorCreatePostPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Cover image or video</label>
+                <label className="block text-sm font-medium text-slate-700">Cover image or video</label>
                 <div className="mt-2 flex items-center gap-3">
                   <input
                     type="file"
@@ -375,40 +375,40 @@ export default function AuthorCreatePostPage() {
                         setUploadingCover(false);
                       }
                     }}
-                    className="rounded-2xl text-sm"
+                    className="rounded-lg text-sm text-slate-600"
                   />
                   <input
                     placeholder="or paste url directly"
                     value={coverImageUrl ?? ""}
                     onChange={(e) => setCoverImageUrl(e.target.value || null)}
-                    className="flex-1 rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white focus:border-emerald-500 focus:outline-none transition"
+                    className="field flex-1 rounded-xl px-4 py-3 text-sm text-slate-950 outline-none"
                   />
                   {uploadingCover ? <div className="text-sm text-emerald-400">Uploading…</div> : null}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">SEO title</label>
+                <label className="block text-sm font-medium text-slate-700">SEO title</label>
                 <input
                   value={seoTitle ?? ""}
                   onChange={(e) => setSeoTitle(e.target.value || null)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                   placeholder="Custom SEO Title"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">SEO description</label>
+                <label className="block text-sm font-medium text-slate-700">SEO description</label>
                 <input
                   value={seoDescription ?? ""}
                   onChange={(e) => setSeoDescription(e.target.value || null)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                   placeholder="Search engine meta description"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Canonical URL / image</label>
+                <label className="block text-sm font-medium text-slate-700">Canonical URL / image</label>
                 <div className="mt-2 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <input
@@ -431,25 +431,25 @@ export default function AuthorCreatePostPage() {
                           setUploadingCover(false);
                         }
                       }}
-                      className="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-2 text-sm"
+                      className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600"
                     />
-                    <span className="text-xs text-slate-405">Upload thumbnail image</span>
+                    <span className="text-xs text-slate-500">Upload thumbnail image</span>
                   </div>
                   <input
                     placeholder="or paste canonical URL"
                     value={canonicalUrl ?? ""}
                     onChange={(e) => setCanonicalUrl(e.target.value || null)}
-                    className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                    className="field w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-200">Status</label>
+                <label className="block text-sm font-medium text-slate-700">Status</label>
                 <select
                   value={statusVal}
                   onChange={(e) => setStatusVal(e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white focus:border-emerald-500 focus:outline-none transition"
+                  className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
                 >
                   <option value="draft">Draft</option>
                   <option value="published">Published</option>
@@ -457,10 +457,10 @@ export default function AuthorCreatePostPage() {
               </div>
 
                <div>
-                <label className="block text-sm font-semibold text-slate-205">Reading time (automatic)</label>
-                <div className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 flex items-center gap-2">
-                  <span className="text-emerald-400 font-bold text-lg">{readingTime ?? 1}</span>
-                  <span className="text-sm text-slate-400 font-medium">min read (estimated from word count)</span>
+                <label className="block text-sm font-medium text-slate-700">Reading time (automatic)</label>
+                <div className="mt-2 flex w-full items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <span className="text-lg font-medium text-emerald-700">{readingTime ?? 1}</span>
+                  <span className="text-sm font-medium text-slate-600">min read (estimated from word count)</span>
                 </div>
               </div>
 
@@ -470,9 +470,9 @@ export default function AuthorCreatePostPage() {
                   type="checkbox"
                   checked={isFeatured}
                   onChange={(e) => setIsFeatured(e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-emerald-600 focus:ring-emerald-500"
+                  className="h-4 w-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-500"
                 />
-                <label htmlFor="featured" className="text-sm font-semibold text-slate-200">Feature this post on dashboard</label>
+                <label htmlFor="featured" className="text-sm font-medium text-slate-700">Feature this post on dashboard</label>
               </div>
             </div>
           </div>
@@ -480,22 +480,22 @@ export default function AuthorCreatePostPage() {
           {/* Editor & Preview Split Panel */}
           <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             {/* Block Editor */}
-            <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
+            <div className="rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">Post Content</h2>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-400 font-semibold">Editor</span>
+                <h2 className="text-lg font-medium text-slate-950">Post Content</h2>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Editor</span>
               </div>
               <BlockEditor value={blocks} onChange={setBlocks} />
             </div>
 
             {/* Live Preview */}
-            <div className="rounded-[40px] border border-slate-800 bg-slate-900/40 p-6 shadow-xl">
+            <div className="rounded-2xl border border-slate-200 bg-white/92 p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">Live Layout Preview</h2>
-                <span className="rounded-full bg-slate-800 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-400 font-semibold">Preview</span>
+                <h2 className="text-lg font-medium text-slate-950">Live Layout Preview</h2>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Preview</span>
               </div>
               {coverImageUrl ? (
-                <div className="mb-4 overflow-hidden rounded-3xl bg-slate-950 border border-slate-800">
+                <div className="mb-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                   {coverImageUrl.match(/\.(mp4|webm|ogg)$/i) ? (
                     <video src={coverImageUrl} controls className="h-52 w-full object-cover" />
                   ) : (
@@ -503,20 +503,20 @@ export default function AuthorCreatePostPage() {
                   )}
                 </div>
               ) : null}
-              <div className="space-y-4 text-slate-100">
+              <div className="space-y-4 text-slate-900">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <div className="text-sm font-bold text-white">{authorName || "Author"}</div>
+                    <div className="text-sm font-medium text-slate-950">{authorName || "Author"}</div>
                     <div className="text-xs text-slate-500">{new Date().toLocaleDateString()}</div>
                   </div>
-                  <div className="rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-400">{statusVal}</div>
+                  <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs uppercase tracking-[0.16em] text-slate-600">{statusVal}</div>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white leading-snug">{title || "Untitled post"}</h3>
-                  {seoTitle ? <p className="mt-2 text-xs text-emerald-400 font-semibold">SEO: {seoTitle}</p> : null}
+                  <h3 className="text-2xl font-medium leading-snug text-slate-950">{title || "Untitled post"}</h3>
+                  {seoTitle ? <p className="mt-2 text-xs font-medium text-emerald-700">SEO: {seoTitle}</p> : null}
                 </div>
-                {excerpt ? <p className="text-sm leading-relaxed text-slate-350">{excerpt}</p> : null}
-                <article className="prose prose-invert max-w-none text-slate-205">
+                {excerpt ? <p className="text-sm leading-relaxed text-slate-600">{excerpt}</p> : null}
+                <article className="prose prose-slate max-w-none text-slate-700">
                   {blocks.map((b) => renderBlock(b))}
                 </article>
               </div>

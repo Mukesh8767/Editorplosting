@@ -228,7 +228,7 @@ export default function AuthorBrochuresPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="text-sm font-semibold text-slate-205">Title</label>
+                <label className="text-sm font-semibold text-slate-900">Title</label>
                 <input
                   type="text"
                   value={title}
@@ -239,7 +239,7 @@ export default function AuthorBrochuresPage() {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-slate-205">Description</label>
+                <label className="text-sm font-semibold text-slate-900">Description</label>
                 <textarea
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
@@ -249,7 +249,7 @@ export default function AuthorBrochuresPage() {
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-slate-205">PDF File</label>
+                <label className="text-sm font-semibold text-slate-900">PDF File</label>
                 <input
                   type="file"
                   accept="application/pdf"
@@ -320,7 +320,7 @@ export default function AuthorBrochuresPage() {
                         <button
                           type="button"
                           onClick={() => handleDownload(item.pdf_url, item.title)}
-                          className="rounded-2xl bg-slate-800 border border-slate-750 px-4 py-2 text-xs font-semibold text-slate-205 transition hover:bg-slate-700"
+                          className="rounded-2xl bg-slate-800 border border-slate-750 px-4 py-2 text-xs font-semibold text-slate-900 transition hover:bg-slate-700"
                         >
                           Download
                         </button>

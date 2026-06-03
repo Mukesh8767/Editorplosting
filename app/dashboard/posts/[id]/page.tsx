@@ -158,7 +158,7 @@ export default async function AuthorPostDetailPage({ params }: Props) {
                     alt={author.full_name || author.username || "Author"}
                     className="h-8 w-8 rounded-full object-cover border border-slate-700"
                   />
-                  <span className="font-semibold text-slate-205">{author.full_name || author.username || "Unknown author"}</span>
+                  <span className="font-semibold text-slate-900">{author.full_name || author.username || "Unknown author"}</span>
                 </div>
               ) : null}
               <span className="h-1 w-1 rounded-full bg-slate-700" />

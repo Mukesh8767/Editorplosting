@@ -82,29 +82,24 @@ export default async function BlogPostPage({ params }: Props) {
   })();
 
   return (
-    <div className="app-shell min-h-screen relative overflow-hidden pb-20">
-      {/* Soft abstract glows */}
-      <div className="absolute top-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-emerald-500/5 blur-[120px] -z-10" />
-      <div className="absolute bottom-[20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-emerald-400/5 blur-[150px] -z-10" />
-
-      {/* Glassmorphic Navbar */}
-      <nav className="sticky top-0 w-full z-50 border-b border-white/60 bg-white/70 backdrop-blur-md shadow-sm">
+    <div className="app-shell min-h-screen pb-20 text-slate-900">
+      <nav className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/85 shadow-sm backdrop-blur-md">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <Link href="/posts" className="flex items-center gap-2">
-            <span className="text-xl font-black text-slate-900 tracking-tight hover:text-emerald-700 transition">
+            <span className="text-xl font-medium tracking-tight text-slate-950 transition hover:text-emerald-700">
               Sustainability<span className="text-emerald-600">Journal</span>
             </span>
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/posts" className="text-sm font-semibold text-slate-700 hover:text-emerald-600 transition">
+            <Link href="/posts" className="text-sm font-medium text-slate-900 transition hover:text-emerald-700">
               Articles
             </Link>
-            <Link href="/events" className="text-sm font-semibold text-slate-700 hover:text-emerald-600 transition">
+            <Link href="/events" className="text-sm font-medium text-slate-600 transition hover:text-emerald-700">
               Events
             </Link>
             <Link
               href="/login"
-              className="rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 text-xs shadow-md shadow-emerald-600/10 transition"
+              className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-800"
             >
               Writer Dashboard
             </Link>
@@ -116,13 +111,13 @@ export default async function BlogPostPage({ params }: Props) {
         {/* Return Button with slide hover animation */}
         <Link
           href="/posts"
-          className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 hover:text-emerald-500 transition mb-8 group"
+          className="group mb-8 inline-flex items-center gap-2 text-xs font-medium text-emerald-700 transition hover:text-emerald-800"
         >
           <span className="transition-transform duration-300 group-hover:-translate-x-1 inline-block">←</span> Back to Articles
         </Link>
 
         {/* Article Card Wrapper */}
-        <article className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-2xl backdrop-blur-sm">
+        <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white/90 shadow-md">
           
           <div className="p-6 sm:p-10 md:p-12">
             {/* Tags */}
@@ -131,7 +126,7 @@ export default async function BlogPostPage({ params }: Props) {
                 ? post.tags.map((tag: string) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-emerald-50 border border-emerald-100/50 px-3 py-1 text-xs font-bold text-emerald-700"
+                      className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
                     >
                       {tag}
                     </span>
@@ -140,7 +135,7 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black leading-tight text-slate-950 tracking-tight mt-6">
+            <h1 className="mt-6 text-3xl font-medium leading-tight tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
               {post.title}
             </h1>
 
@@ -150,7 +145,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <img src={post.authorAvatar} alt={post.authorName} className="h-full w-full object-cover" />
               </div>
               <div>
-                <div className="font-bold text-slate-900 leading-tight">By {post.authorName}</div>
+                <div className="font-medium leading-tight text-slate-900">By {post.authorName}</div>
                 <div className="text-xs text-slate-500 mt-1">
                   {post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}
                   {post.reading_time ? ` · ${post.reading_time} min read` : ""}
@@ -175,7 +170,7 @@ export default async function BlogPostPage({ params }: Props) {
             {contentBlocks.map((b: any) => {
               if (b.type === "heading") {
                 return (
-                  <h2 key={b.id} className="text-xl sm:text-2xl font-black text-slate-950 mt-8 mb-4 leading-snug">
+                  <h2 key={b.id} className="mb-4 mt-8 text-xl font-medium leading-snug text-slate-950 sm:text-2xl">
                     {extractText(b.data?.text)}
                   </h2>
                 );
