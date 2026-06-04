@@ -211,6 +211,15 @@ export default function CreatePostPage() {
     setMessage(publish ? "Post published successfully." : "Draft saved successfully.");
   };
 
+  const uploadToApi = async (file: File) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload-media", { method: "POST", body: fd });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || "Upload failed");
+    return json?.url || null;
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-6xl">
@@ -336,17 +345,13 @@ export default function CreatePostPage() {
                   <input
                     type="file"
                     accept="image/*,video/*"
-                    onChange={async (e) => {
+                      onChange={async (e) => {
                       const f = e.target.files?.[0];
                       if (!f) return;
                       setUploadingCover(true);
                       try {
-                        const supabase = getSupabaseClient();
-                        const path = `covers/${Date.now()}-${f.name}`;
-                        const { data, error } = await supabase.storage.from("post-uploads").upload(path, f, { upsert: true });
-                        if (error) throw error;
-                        const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-                        setCoverImageUrl(urlData.publicUrl);
+                        const url = await uploadToApi(f);
+                        setCoverImageUrl(url);
                       } catch (err: any) {
                         setMessage(err?.message || "Upload failed.");
                       } finally {
@@ -395,12 +400,8 @@ export default function CreatePostPage() {
                         if (!file) return;
                         setUploadingCover(true);
                         try {
-                          const supabase = getSupabaseClient();
-                          const path = `canonicals/${Date.now()}-${file.name}`;
-                          const { data, error } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
-                          if (error) throw error;
-                          const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-                          setCanonicalUrl(urlData.publicUrl);
+                          const url = await uploadToApi(file);
+                          setCanonicalUrl(url);
                         } catch (err: any) {
                           setMessage(err?.message || "Upload failed.");
                         } finally {

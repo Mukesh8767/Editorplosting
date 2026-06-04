@@ -90,12 +90,12 @@ export default function BrochuresAdminPage() {
     let pdfUrlToSubmit = currentPdfUrl;
     if (pdfFile) {
       try {
-        const supabase = getSupabaseClient();
-        const path = `brochures/${Date.now()}-${pdfFile.name}`;
-        const { data, error: uploadError } = await supabase.storage.from("post-uploads").upload(path, pdfFile, { upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-        pdfUrlToSubmit = urlData.publicUrl;
+        const fd = new FormData();
+        fd.append("file", pdfFile);
+        const res = await fetch("/api/upload-media", { method: "POST", body: fd });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json?.error || "File upload failed");
+        pdfUrlToSubmit = json?.url;
       } catch (err: any) {
         setError(err?.message || "File upload to storage failed.");
         return;

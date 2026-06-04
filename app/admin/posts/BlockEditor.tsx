@@ -110,12 +110,12 @@ export default function BlockEditor({ value, onChange }: { value?: Block[]; onCh
 
   const uploadImage = async (file: File, id: string) => {
     try {
-      const supabase = getSupabaseClient();
-      const path = `post-media/${Date.now()}-${file.name}`;
-      const { data, error } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
-      if (error) throw error;
-      const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-      const url = urlData.publicUrl;
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload-media", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Upload failed");
+      const url = json?.url;
       const next = activeBlocks.map((block) =>
         block.id === id ? ({ ...block, data: { ...(block.data as any), url } } as Block) : block
       );

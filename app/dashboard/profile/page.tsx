@@ -131,12 +131,12 @@ export default function AuthorProfilePage() {
     setUploading(true);
     setError("");
     try {
-      const supabase = getSupabaseClient();
-      const path = `avatars/${Date.now()}-${file.name}`;
-      const { data, error: uploadError } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
-      if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-      setAvatarUrl(urlData.publicUrl || null);
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload-author-photo", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || "Upload failed");
+      setAvatarUrl(json?.url || null);
     } catch (err: any) {
       setError(err?.message || "Upload failed.");
     } finally {

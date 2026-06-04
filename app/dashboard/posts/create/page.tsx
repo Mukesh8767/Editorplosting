@@ -221,6 +221,15 @@ export default function AuthorCreatePostPage() {
     }
   };
 
+  const uploadToApi = async (file: File) => {
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/upload-media", { method: "POST", body: fd });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json?.error || "Upload failed");
+    return json?.url || null;
+  };
+
   if (pageLoading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-400">Loading editor...</div>;
   }
@@ -358,23 +367,19 @@ export default function AuthorCreatePostPage() {
                   <input
                     type="file"
                     accept="image/*,video/*"
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      setUploadingCover(true);
-                      try {
-                        const supabase = getSupabaseClient();
-                        const path = `covers/${Date.now()}-${f.name}`;
-                        const { data, error } = await supabase.storage.from("post-uploads").upload(path, f, { upsert: true });
-                        if (error) throw error;
-                        const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-                        setCoverImageUrl(urlData.publicUrl);
-                      } catch (err: any) {
-                        setMessage(err?.message || "Upload failed.");
-                      } finally {
-                        setUploadingCover(false);
-                      }
-                    }}
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        setUploadingCover(true);
+                        try {
+                          const url = await uploadToApi(f);
+                          setCoverImageUrl(url);
+                        } catch (err: any) {
+                          setMessage(err?.message || "Upload failed.");
+                        } finally {
+                          setUploadingCover(false);
+                        }
+                      }}
                     className="rounded-lg text-sm text-slate-600"
                   />
                   <input
@@ -419,12 +424,8 @@ export default function AuthorCreatePostPage() {
                         if (!file) return;
                         setUploadingCover(true);
                         try {
-                          const supabase = getSupabaseClient();
-                          const path = `canonicals/${Date.now()}-${file.name}`;
-                          const { data, error } = await supabase.storage.from("post-uploads").upload(path, file, { upsert: true });
-                          if (error) throw error;
-                          const { data: urlData } = supabase.storage.from("post-uploads").getPublicUrl(data.path);
-                          setCanonicalUrl(urlData.publicUrl);
+                          const url = await uploadToApi(file);
+                          setCanonicalUrl(url);
                         } catch (err: any) {
                           setMessage(err?.message || "Upload failed.");
                         } finally {
