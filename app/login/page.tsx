@@ -76,7 +76,7 @@ export default function LoginPage() {
               <input
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
-                className="field w-full rounded-xl px-4 py-3.5 text-sm text-slate-900 placeholder-slate-400 outline-none"
+                className="field w-full rounded-xl px-4 py-3.5 text-sm text-black placeholder-slate-400 outline-none"
                 placeholder="admin or email address"
                 required
               />
@@ -90,7 +90,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="field w-full rounded-xl px-4 py-3.5 text-sm text-slate-900 placeholder-slate-400 outline-none"
+                className="field w-full rounded-xl px-4 py-3.5 text-sm text-black placeholder-slate-400 outline-none"
                 placeholder="Enter password"
                 required
               />

@@ -110,7 +110,7 @@ export default function AuthorTopicsPage() {
                           {subtopics.map(sub => (
                             <div key={sub.id} className="flex items-center justify-between bg-slate-900/40 p-2.5 rounded-md border border-slate-850 hover:border-slate-750 transition">
                               <div>
-                                <p className="text-sm font-semibold text-slate-900">{sub.title}</p>
+                                <p className="text-sm font-semibold text-black">{sub.title}</p>
                                 <p className="text-xs text-slate-500">/{sub.slug || sub.title.toLowerCase().replace(/\s+/g,'-')}</p>
                               </div>
                               <div className="flex gap-2">

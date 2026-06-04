@@ -228,43 +228,43 @@ export default function AuthorBrochuresPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="text-sm font-semibold text-slate-900">Title</label>
+                <label className="text-sm font-semibold text-black">Title</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-500 transition"
+                  className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-black outline-none focus:border-emerald-500 transition"
                   placeholder="Enter brochure title"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-slate-900">Description</label>
+                <label className="text-sm font-semibold text-black">Description</label>
                 <textarea
                   value={description}
                   onChange={(event) => setDescription(event.target.value)}
-                  className="mt-2 w-full min-h-[120px] rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-500 transition"
+                  className="mt-2 w-full min-h-[120px] rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-black outline-none focus:border-emerald-500 transition"
                   placeholder="Provide details about brochure contents"
                 />
               </div>
 
               <div>
-                <label className="text-sm font-semibold text-slate-900">PDF File</label>
+                <label className="text-sm font-semibold text-black">PDF File</label>
                 <input
                   type="file"
                   accept="application/pdf"
                   onChange={(event) => setPdfFile(event.target.files?.[0] ?? null)}
-                  className="mt-2 block w-full text-sm text-slate-250 file:rounded-full file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-slate-950 file:font-bold hover:file:bg-emerald-450 transition cursor-pointer"
+                  className="mt-2 block w-full text-sm text-black file:rounded-full file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-slate-950 file:font-bold hover:file:bg-emerald-450 transition cursor-pointer"
                 />
                 {editingId && currentPdfUrl ? (
                   <p className="mt-2 text-xs text-slate-400 truncate">
-                    Current file: <span className="font-semibold text-slate-300">{currentPdfUrl}</span>
+                    Current file: <span className="font-semibold text-black">{currentPdfUrl}</span>
                   </p>
                 ) : null}
               </div>
 
               <div className="flex items-center gap-3">
-                <label className="inline-flex items-center gap-2 text-sm text-slate-200 cursor-pointer">
+                <label className="inline-flex items-center gap-2 text-sm text-black cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isActive}

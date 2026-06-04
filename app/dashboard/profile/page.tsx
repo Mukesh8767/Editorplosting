@@ -193,20 +193,20 @@ export default function AuthorProfilePage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-900">Display Name</label>
+                <label className="block text-sm font-semibold text-black">Display Name</label>
                 <input
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
-                  className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                  className="mt-3 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-900">Email / Username (read-only)</label>
+                <label className="block text-sm font-semibold text-black">Email / Username (read-only)</label>
                 <input
                   value={user?.username ?? ""}
                   readOnly
-                  className="mt-3 w-full rounded-lg border border-slate-750 bg-slate-950/60 px-4 py-3 text-slate-500 outline-none text-sm cursor-not-allowed"
+                  className="mt-3 w-full rounded-lg border border-slate-750 bg-slate-950/60 px-4 py-3 text-black outline-none text-sm cursor-not-allowed"
                 />
               </div>
 
@@ -218,33 +218,33 @@ export default function AuthorProfilePage() {
 
                 <div className="mt-5 grid gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-900">Current Password</label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={(event) => setCurrentPassword(event.target.value)}
-                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                    />
+                    <label className="block text-sm font-semibold text-black">Current Password</label>
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(event) => setCurrentPassword(event.target.value)}
+                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                      />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-900">New Password</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(event) => setNewPassword(event.target.value)}
-                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                    />
+                    <label className="block text-sm font-semibold text-black">New Password</label>
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                      />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-900">Confirm New Password</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                    />
+                    <label className="block text-sm font-semibold text-black">Confirm New Password</label>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                      />
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
@@ -267,7 +267,7 @@ export default function AuthorProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-900">Profile Photo</label>
+                <label className="block text-sm font-semibold text-black">Profile Photo</label>
                 <div className="mt-3 flex items-center gap-4">
                   <input
                     type="file"
@@ -276,7 +276,7 @@ export default function AuthorProfilePage() {
                       const file = event.target.files?.[0];
                       if (file) handleUpload(file);
                     }}
-                    className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs text-slate-300 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-emerald-500 file:text-slate-950 file:font-bold file:text-xs hover:file:bg-emerald-450 transition cursor-pointer"
+                    className="rounded-lg border border-slate-700 bg-slate-950 px-4 py-2.5 text-black text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-emerald-500 file:text-slate-950 file:font-bold file:text-xs hover:file:bg-emerald-450 transition cursor-pointer"
                   />
                   {uploading ? <span className="text-xs text-emerald-450 font-bold">Uploading…</span> : null}
                 </div>

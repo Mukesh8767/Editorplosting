@@ -281,35 +281,35 @@ export default function AuthorEventsPage() {
 
             <form onSubmit={handleSave} className="space-y-5">
               <div>
-                <label className="block text-sm font-semibold text-slate-300">Event Title *</label>
+                <label className="block text-sm font-semibold text-black">Event Title *</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
+                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
                   placeholder="e.g. Green Energy Webinar 2026"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-300">Description</label>
+                <label className="block text-sm font-semibold text-black">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
+                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black placeholder-slate-500 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
                   placeholder="Details about the event agenda, topics, speakers..."
                 />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300">Event Type</label>
+                  <label className="block text-sm font-semibold text-black">Event Type</label>
                   <select
                     value={eventType}
                     onChange={(e) => setEventType(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
                   >
                     <option value="Webinar">Webinar</option>
                     <option value="Workshop">Workshop</option>
@@ -327,7 +327,7 @@ export default function AuthorEventsPage() {
                     onChange={(e) => setIsFeatured(e.target.checked)}
                     className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500"
                   />
-                  <label htmlFor="featured" className="text-sm font-semibold text-slate-300">
+                  <label htmlFor="featured" className="text-sm font-semibold text-black">
                     Feature Event
                   </label>
                 </div>
@@ -335,65 +335,65 @@ export default function AuthorEventsPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300">Start Date & Time *</label>
+                  <label className="block text-sm font-semibold text-black">Start Date & Time *</label>
                   <input
                     type="datetime-local"
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white outline-none focus:border-emerald-500 transition"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black outline-none focus:border-emerald-500 transition"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300">End Date & Time</label>
+                  <label className="block text-sm font-semibold text-black">End Date & Time</label>
                   <input
                     type="datetime-local"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white outline-none focus:border-emerald-500 transition"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black outline-none focus:border-emerald-500 transition"
                   />
                 </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300">Location / Platform</label>
+                  <label className="block text-sm font-semibold text-black">Location / Platform</label>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition"
                     placeholder="e.g. Zoom / Paris, France"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-slate-300">Organizer</label>
+                  <label className="block text-sm font-semibold text-black">Organizer</label>
                   <input
                     type="text"
                     value={organizer}
                     onChange={(e) => setOrganizer(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition"
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition"
                     placeholder="e.g. Sustainability Team"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-300">Registration Link</label>
+                <label className="block text-sm font-semibold text-black">Registration Link</label>
                 <input
                   type="url"
                   value={registrationUrl}
                   onChange={(e) => setRegistrationUrl(e.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-white placeholder-slate-500 outline-none focus:border-emerald-500 transition"
+                  className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition"
                   placeholder="https://zoom.us/webinar/register/..."
                 />
               </div>
 
               {/* Cover media section */}
               <div className="rounded-xl border border-slate-800 p-4 bg-slate-950/20 space-y-4">
-                <label className="block text-sm font-semibold text-slate-350">Cover Image or Video (main cover art)</label>
+                <label className="block text-sm font-semibold text-black">Cover Image or Video (main cover art)</label>
                 
                 <input
                   type="file"
@@ -445,7 +445,7 @@ export default function AuthorEventsPage() {
                     type="text"
                     value={coverImageUrl}
                     onChange={(e) => setCoverImageUrl(e.target.value)}
-                    className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-slate-300 placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                    className="flex-1 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
                     placeholder="Or paste cover URL"
                   />
                   {coverImageUrl && (
@@ -472,7 +472,7 @@ export default function AuthorEventsPage() {
 
               {/* Additional gallery media section */}
               <div className="rounded-xl border border-slate-800 p-4 bg-slate-950/20 space-y-4">
-                <label className="block text-sm font-semibold text-slate-350">Additional Event Gallery Media (Images & Videos)</label>
+                <label className="block text-sm font-semibold text-black">Additional Event Gallery Media (Images & Videos)</label>
                 
                 <input
                   type="file"
