@@ -4,6 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sustainability Editor",
   description: "Content studio for sustainability articles, authors, and brochures.",
+  icons: {
+    icon: '/urllogo.webp',
+    shortcut: '/urllogo.webp',
+    apple: '/urllogo.webp',
+  },
 };
 
 export default function RootLayout({
