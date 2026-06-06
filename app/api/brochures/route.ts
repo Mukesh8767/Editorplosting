@@ -26,7 +26,11 @@ const uploadToCloudinary = async (file: File) => {
     .replace(/\.[^/.]+$/, "")
     .replace(/\s+/g, "_")
     .replace(/[^a-zA-Z0-9_-]/g, "_");
-  return new Promise<string>((resolve, reject) => {
+
+  console.log('[uploadToCloudinary] file:', file.name, 'sizeBytes:', buffer.length);
+  const start = Date.now();
+
+  const uploadPromise = new Promise<string>((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: "brochures",
@@ -36,15 +40,31 @@ const uploadToCloudinary = async (file: File) => {
         overwrite: true,
       },
       (error, result) => {
-        console.log("Cloudinary Result:", result);
-
+        console.log('Cloudinary Result:', result);
         if (error) return reject(error);
-
         resolve(result?.secure_url || result?.url || "");
       }
     );
-    stream.end(buffer);
+    try {
+      stream.end(buffer);
+    } catch (err) {
+      reject(err);
+    }
   });
+
+  const timeoutMs = 60000; // 60s
+  const timeoutPromise = new Promise<string>((_, reject) =>
+    setTimeout(() => reject(new Error(`Cloudinary upload timed out after ${timeoutMs}ms`)), timeoutMs)
+  );
+
+  try {
+    const url = await Promise.race([uploadPromise, timeoutPromise]);
+    console.log('[uploadToCloudinary] finished in', Date.now() - start, 'ms, url:', url);
+    return url;
+  } catch (err: any) {
+    console.error('[uploadToCloudinary] error after', Date.now() - start, 'ms:', err);
+    throw err;
+  }
 };
 
 export async function GET(request: NextRequest) {
@@ -71,7 +91,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const supabaseAdmin = getSupabaseAdmin();
+  console.log('[brochures POST] start');
   const formData = await request.formData();
+  console.log('[brochures POST] formData received');
 
   const id = (formData.get("id") as string) || null;
   const title = (formData.get("title") as string) || "";
@@ -88,12 +110,16 @@ export async function POST(request: NextRequest) {
   let pdf_url = pdfUrlFromForm;
 
   if (fileValue && isFileObject(fileValue)) {
+    console.log('[brochures POST] file detected:', (fileValue as File).name);
     if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
       return NextResponse.json({ error: "Cloudinary is not configured." }, { status: 500 });
     }
     try {
+      console.log('[brochures POST] starting Cloudinary upload');
       pdf_url = await uploadToCloudinary(fileValue);
+      console.log('[brochures POST] Cloudinary upload finished, url:', pdf_url);
     } catch (uploadError: any) {
+      console.error('[brochures POST] Cloudinary upload error:', uploadError);
       return NextResponse.json({ error: uploadError?.message || "Cloudinary upload failed." }, { status: 500 });
     }
   }

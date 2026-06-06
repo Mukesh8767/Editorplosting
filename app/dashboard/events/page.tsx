@@ -16,6 +16,7 @@ export default function AuthorEventsPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventType, setEventType] = useState("Webinar");
+  const [participationType, setParticipationType] = useState<"Organized" | "Attended">("Attended");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [location, setLocation] = useState("");
@@ -173,6 +174,7 @@ export default function AuthorEventsPage() {
         title: title.trim(),
         description: description.trim() || null,
         event_type: eventType,
+        participation_type: participationType,
         start_date: new Date(startDate).toISOString(),
         end_date: endDate ? new Date(endDate).toISOString() : null,
         location: location.trim() || null,
@@ -202,6 +204,7 @@ export default function AuthorEventsPage() {
     setTitle(event.title);
     setDescription(event.description || "");
     setEventType(event.event_type || "Webinar");
+    setParticipationType((event.participation_type as any) || "Attended");
     setStartDate(event.start_date ? new Date(event.start_date).toISOString().slice(0, 16) : "");
     setEndDate(event.end_date ? new Date(event.end_date).toISOString().slice(0, 16) : "");
     setLocation(event.location || "");
@@ -232,6 +235,7 @@ export default function AuthorEventsPage() {
     setTitle("");
     setDescription("");
     setEventType("Webinar");
+    setParticipationType("Attended");
     setStartDate("");
     setEndDate("");
     setLocation("");
@@ -319,18 +323,30 @@ export default function AuthorEventsPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-3 mt-8">
-                  <input
-                    type="checkbox"
-                    id="featured"
-                    checked={isFeatured}
-                    onChange={(e) => setIsFeatured(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500"
-                  />
-                  <label htmlFor="featured" className="text-sm font-semibold text-black">
-                    Feature Event
-                  </label>
+                <div>
+                  <label className="block text-sm font-semibold text-black">Participation Type</label>
+                  <select
+                    value={participationType}
+                    onChange={(e) => setParticipationType(e.target.value as any)}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-black outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition"
+                  >
+                    <option value="Attended">Attended</option>
+                    <option value="Organized">Organized</option>
+                  </select>
                 </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-emerald-500 focus:ring-emerald-500"
+                />
+                <label htmlFor="featured" className="text-sm font-semibold text-black">
+                  Feature Event
+                </label>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -627,13 +643,22 @@ export default function AuthorEventsPage() {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="text-base font-bold text-white truncate group-hover:text-emerald-400 transition">
                             {event.title}
                           </h3>
                           {event.is_featured && (
                             <span className="rounded bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">
                               Featured
+                            </span>
+                          )}
+                          {event.participation_type && (
+                            <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                              event.participation_type === "Organized"
+                                ? "bg-blue-500/10 border border-blue-500/20 text-blue-400"
+                                : "bg-slate-500/10 border border-slate-500/20 text-slate-400"
+                            }`}>
+                              {event.participation_type}
                             </span>
                           )}
                         </div>

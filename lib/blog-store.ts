@@ -55,6 +55,7 @@ export type Event = {
   title: string;
   description?: string | null;
   event_type?: string | null;
+  participation_type?: 'Organized' | 'Attended' | null;
   start_date: string;
   end_date?: string | null;
   location?: string | null;

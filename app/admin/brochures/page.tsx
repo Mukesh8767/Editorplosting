@@ -32,6 +32,7 @@ export default function BrochuresAdminPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -89,17 +90,45 @@ export default function BrochuresAdminPage() {
 
     let pdfUrlToSubmit = currentPdfUrl;
     if (pdfFile) {
+      setUploading(true);
+      setMessage("Uploading PDF directly to Cloudinary...");
       try {
-        const fd = new FormData();
-        fd.append("file", pdfFile);
-        const res = await fetch("/api/upload-media", { method: "POST", body: fd });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json?.error || "File upload failed");
-        pdfUrlToSubmit = json?.url;
+        const signatureRes = await fetch(
+          `/api/cloudinary-signature?filename=${encodeURIComponent(pdfFile.name)}&folder=brochures`
+        );
+        const signatureJson = await signatureRes.json();
+        if (!signatureRes.ok) {
+          throw new Error(signatureJson?.error || "Unable to obtain Cloudinary signature.");
+        }
+
+        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signatureJson.cloudName}/raw/upload`;
+        const cloudinaryForm = new FormData();
+        cloudinaryForm.append("file", pdfFile);
+        cloudinaryForm.append("api_key", signatureJson.apiKey);
+        cloudinaryForm.append("timestamp", String(signatureJson.timestamp));
+        cloudinaryForm.append("signature", signatureJson.signature);
+        cloudinaryForm.append("folder", signatureJson.folder);
+        cloudinaryForm.append("public_id", signatureJson.public_id);
+        cloudinaryForm.append("overwrite", "true");
+
+        const uploadRes = await fetch(cloudinaryUrl, {
+          method: "POST",
+          body: cloudinaryForm,
+        });
+        const uploadJson = await uploadRes.json();
+        if (!uploadRes.ok) {
+          throw new Error(uploadJson?.error?.message || uploadJson?.error || "Cloudinary upload failed.");
+        }
+        pdfUrlToSubmit = uploadJson?.secure_url || uploadJson?.url;
+        if (!pdfUrlToSubmit) {
+          throw new Error("Cloudinary did not return a URL.");
+        }
       } catch (err: any) {
-        setError(err?.message || "File upload to storage failed.");
+        setError(err?.message || "File upload to Cloudinary failed.");
+        setUploading(false);
         return;
       }
+      setUploading(false);
     }
 
     const formData = new FormData();
@@ -270,9 +299,10 @@ export default function BrochuresAdminPage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400"
+                  disabled={uploading}
+                  className="inline-flex items-center justify-center rounded-2xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {editingId ? "Update Brochure" : "Upload Brochure"}
+                  {uploading ? "Uploading..." : editingId ? "Update Brochure" : "Upload Brochure"}
                 </button>
                 <button
                   type="button"

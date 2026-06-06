@@ -14,6 +14,7 @@ type Event = {
   title: string;
   description?: string | null;
   event_type?: string | null;
+  participation_type?: 'Organized' | 'Attended' | null;
   start_date: string;
   end_date?: string | null;
   location?: string | null;
@@ -124,12 +125,23 @@ export default async function PublicEventsPage() {
                         <span className="mt-1 text-[10px] font-medium uppercase tracking-wider">{dateInfo.month}</span>
                       </div>
 
-                      {/* Type Tag */}
-                      {event.event_type && (
-                        <span className="absolute top-4 right-4 z-20 rounded-full border border-white/70 bg-white/88 px-3 py-1 text-[10px] font-medium text-slate-700 backdrop-blur">
-                          {event.event_type}
-                        </span>
-                      )}
+                      {/* Type Tags */}
+                      <div className="absolute top-4 right-4 z-20 flex gap-2">
+                        {event.event_type && (
+                          <span className="rounded-full border border-white/70 bg-white/88 px-3 py-1 text-[10px] font-medium text-slate-700 backdrop-blur">
+                            {event.event_type}
+                          </span>
+                        )}
+                        {event.participation_type && (
+                          <span className={`rounded-full border px-3 py-1 text-[10px] font-medium backdrop-blur ${
+                            event.participation_type === "Organized"
+                              ? "border-blue-200/70 bg-blue-50/88 text-blue-700"
+                              : "border-slate-200/70 bg-slate-50/88 text-slate-700"
+                          }`}>
+                            {event.participation_type}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Content section */}
@@ -215,12 +227,23 @@ export default async function PublicEventsPage() {
                         <span className="mt-0.5 text-[9px] font-medium uppercase tracking-wider">{dateInfo.month}</span>
                       </div>
 
-                      {/* Type Tag */}
-                      {event.event_type && (
-                        <span className="absolute top-3 right-3 z-20 rounded-full border border-white/70 bg-white/88 px-2.5 py-0.5 text-[9px] font-medium text-slate-700 backdrop-blur">
-                          {event.event_type}
-                        </span>
-                      )}
+                      {/* Type Tags */}
+                      <div className="absolute top-3 right-3 z-20 flex gap-1.5">
+                        {event.event_type && (
+                          <span className="rounded-full border border-white/70 bg-white/88 px-2.5 py-0.5 text-[9px] font-medium text-slate-700 backdrop-blur">
+                            {event.event_type}
+                          </span>
+                        )}
+                        {event.participation_type && (
+                          <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-medium backdrop-blur ${
+                            event.participation_type === "Organized"
+                              ? "border-blue-200/70 bg-blue-50/88 text-blue-700"
+                              : "border-slate-200/70 bg-slate-50/88 text-slate-700"
+                          }`}>
+                            {event.participation_type}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Content section */}
