@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import PasswordInput from "@/components/PasswordInput";
 import { getSupabaseClient } from "@/lib/supabase-client";
 
 type RecoveryStatus = "checking" | "ready" | "invalid" | "saving" | "success";
@@ -101,27 +102,21 @@ export default function ResetPasswordPage() {
 
         {status === "ready" || status === "saving" ? (
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700">New password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
-                placeholder="Enter new password"
-              />
-            </div>
+            <PasswordInput
+              label="New password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
+              placeholder="Enter new password"
+            />
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700">Confirm password</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
-                placeholder="Confirm new password"
-              />
-            </div>
+            <PasswordInput
+              label="Confirm password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              className="field mt-2 w-full rounded-xl px-4 py-3 text-slate-950 outline-none"
+              placeholder="Confirm new password"
+            />
 
             <button type="submit" disabled={status === "saving"} className="btn-primary w-full rounded-xl px-6 py-3 text-sm font-semibold transition disabled:opacity-60">
               {status === "saving" ? "Updating password..." : "Update password"}

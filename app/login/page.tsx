@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/PasswordInput";
 import { authenticate, setSession } from "@/lib/blog-store";
 
 export default function LoginPage() {
@@ -82,19 +83,14 @@ export default function LoginPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-xs font-medium uppercase tracking-[0.14em] text-slate-600">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="field w-full rounded-xl px-4 py-3.5 text-sm text-black placeholder-slate-400 outline-none"
-                placeholder="Enter password"
-                required
-              />
-            </div>
+            <PasswordInput
+              label="Password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              className="field w-full rounded-xl px-4 py-3.5 text-sm text-black placeholder-slate-400 outline-none"
+              placeholder="Enter password"
+              required
+            />
 
             {forgotMessage ? (
               <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs leading-relaxed text-emerald-800">

@@ -91,40 +91,39 @@ export default function BrochuresAdminPage() {
     let pdfUrlToSubmit = currentPdfUrl;
     if (pdfFile) {
       setUploading(true);
-      setMessage("Uploading PDF directly to Cloudinary...");
+      setMessage("Uploading PDF to Supabase storage...");
       try {
-        const signatureRes = await fetch(
-          `/api/cloudinary-signature?filename=${encodeURIComponent(pdfFile.name)}&folder=brochures`
-        );
-        const signatureJson = await signatureRes.json();
-        if (!signatureRes.ok) {
-          throw new Error(signatureJson?.error || "Unable to obtain Cloudinary signature.");
+        const supabase = getSupabaseClient();
+        const extension = pdfFile.name.split(".").pop() || "pdf";
+        const safeName = pdfFile.name
+          .replace(/\.[^/.]+$/, "")
+          .replace(/\s+/g, "_")
+          .replace(/[^a-zA-Z0-9_-]/g, "_")
+          .slice(0, 150);
+        const filePath = `brochures/${safeName}-${Date.now()}.${extension}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("sustainwheelsolutions")
+          .upload(filePath, pdfFile, {
+            contentType: pdfFile.type || "application/pdf",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw uploadError;
         }
 
-        const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${signatureJson.cloudName}/raw/upload`;
-        const cloudinaryForm = new FormData();
-        cloudinaryForm.append("file", pdfFile);
-        cloudinaryForm.append("api_key", signatureJson.apiKey);
-        cloudinaryForm.append("timestamp", String(signatureJson.timestamp));
-        cloudinaryForm.append("signature", signatureJson.signature);
-        cloudinaryForm.append("folder", signatureJson.folder);
-        cloudinaryForm.append("public_id", signatureJson.public_id);
-        cloudinaryForm.append("overwrite", "true");
+        const { data: publicUrlData } = await supabase.storage
+          .from("sustainwheelsolutions")
+          .getPublicUrl(filePath);
 
-        const uploadRes = await fetch(cloudinaryUrl, {
-          method: "POST",
-          body: cloudinaryForm,
-        });
-        const uploadJson = await uploadRes.json();
-        if (!uploadRes.ok) {
-          throw new Error(uploadJson?.error?.message || uploadJson?.error || "Cloudinary upload failed.");
+        if (!publicUrlData?.publicUrl) {
+          throw new Error("Unable to generate public URL for brochure.");
         }
-        pdfUrlToSubmit = uploadJson?.secure_url || uploadJson?.url;
-        if (!pdfUrlToSubmit) {
-          throw new Error("Cloudinary did not return a URL.");
-        }
+
+        pdfUrlToSubmit = publicUrlData.publicUrl;
       } catch (err: any) {
-        setError(err?.message || "File upload to Cloudinary failed.");
+        setError(err?.message || "File upload to Supabase storage failed.");
         setUploading(false);
         return;
       }

@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
 import { getSupabaseAdmin } from "../../../lib/supabase-client";
-import { config } from "../../../lib/config";
 
 const brochureSelect = `id, title, description, pdf_url, uploaded_by, is_active, created_at, updated_at, uploader:profiles!uploaded_by(id, full_name, username, avatar_url)`;
-
-cloudinary.config({
-  cloud_name: config.cloudinaryCloudName,
-  api_key: config.cloudinaryApiKey,
-  api_secret: config.cloudinaryApiSecret,
-});
 
 const isFileObject = (value: FormDataEntryValue): value is File => {
   return (
@@ -20,51 +12,43 @@ const isFileObject = (value: FormDataEntryValue): value is File => {
   );
 };
 
-const uploadToCloudinary = async (file: File) => {
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const safeFilename = file.name
+const BUCKET_NAME = "sustainwheelsolutions";
+
+const getSafeStoragePath = (file: File) => {
+  const extension = file.name.split(".").pop() || "pdf";
+  const safeName = file.name
     .replace(/\.[^/.]+$/, "")
     .replace(/\s+/g, "_")
-    .replace(/[^a-zA-Z0-9_-]/g, "_");
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 150);
+  return `brochures/${safeName}-${Date.now()}.${extension}`;
+};
 
-  console.log('[uploadToCloudinary] file:', file.name, 'sizeBytes:', buffer.length);
-  const start = Date.now();
+const uploadBrochureToSupabase = async (file: File) => {
+  const supabaseAdmin = getSupabaseAdmin();
+  const filePath = getSafeStoragePath(file);
+  const buffer = Buffer.from(await file.arrayBuffer());
 
-  const uploadPromise = new Promise<string>((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "brochures",
-        resource_type: "raw",
-        type: "upload",
-        public_id: safeFilename, // keep .pdf extension so Cloudinary serves correct MIME type
-        overwrite: true,
-      },
-      (error, result) => {
-        console.log('Cloudinary Result:', result);
-        if (error) return reject(error);
-        resolve(result?.secure_url || result?.url || "");
-      }
-    );
-    try {
-      stream.end(buffer);
-    } catch (err) {
-      reject(err);
-    }
-  });
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(BUCKET_NAME)
+    .upload(filePath, buffer, {
+      contentType: file.type || "application/pdf",
+      upsert: false,
+    });
 
-  const timeoutMs = 60000; // 60s
-  const timeoutPromise = new Promise<string>((_, reject) =>
-    setTimeout(() => reject(new Error(`Cloudinary upload timed out after ${timeoutMs}ms`)), timeoutMs)
-  );
-
-  try {
-    const url = await Promise.race([uploadPromise, timeoutPromise]);
-    console.log('[uploadToCloudinary] finished in', Date.now() - start, 'ms, url:', url);
-    return url;
-  } catch (err: any) {
-    console.error('[uploadToCloudinary] error after', Date.now() - start, 'ms:', err);
-    throw err;
+  if (uploadError) {
+    throw uploadError;
   }
+
+  const { data: publicUrlData } = await supabaseAdmin.storage
+    .from(BUCKET_NAME)
+    .getPublicUrl(filePath);
+
+  if (!publicUrlData?.publicUrl) {
+    throw new Error("Unable to generate public URL for brochure.");
+  }
+
+  return publicUrlData.publicUrl;
 };
 
 export async function GET(request: NextRequest) {
@@ -110,17 +94,10 @@ export async function POST(request: NextRequest) {
   let pdf_url = pdfUrlFromForm;
 
   if (fileValue && isFileObject(fileValue)) {
-    console.log('[brochures POST] file detected:', (fileValue as File).name);
-    if (!config.cloudinaryCloudName || !config.cloudinaryApiKey || !config.cloudinaryApiSecret) {
-      return NextResponse.json({ error: "Cloudinary is not configured." }, { status: 500 });
-    }
     try {
-      console.log('[brochures POST] starting Cloudinary upload');
-      pdf_url = await uploadToCloudinary(fileValue);
-      console.log('[brochures POST] Cloudinary upload finished, url:', pdf_url);
+      pdf_url = await uploadBrochureToSupabase(fileValue);
     } catch (uploadError: any) {
-      console.error('[brochures POST] Cloudinary upload error:', uploadError);
-      return NextResponse.json({ error: uploadError?.message || "Cloudinary upload failed." }, { status: 500 });
+      return NextResponse.json({ error: uploadError?.message || "Supabase storage upload failed." }, { status: 500 });
     }
   }
 

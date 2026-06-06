@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PasswordInput from "@/components/PasswordInput";
 import { clearSession, getSession, setSession, type User } from "@/lib/blog-store";
 import { getSupabaseClient } from "@/lib/supabase-client";
 
@@ -217,35 +218,26 @@ export default function AuthorProfilePage() {
                 </p>
 
                 <div className="mt-5 grid gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-black">Current Password</label>
-                      <input
-                        type="password"
-                        value={currentPassword}
-                        onChange={(event) => setCurrentPassword(event.target.value)}
-                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                      />
-                  </div>
+                  <PasswordInput
+                    label="Current Password"
+                    value={currentPassword}
+                    onChange={(event) => setCurrentPassword(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-black">New Password</label>
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(event) => setNewPassword(event.target.value)}
-                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                      />
-                  </div>
+                  <PasswordInput
+                    label="New Password"
+                    value={newPassword}
+                    onChange={(event) => setNewPassword(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-semibold text-black">Confirm New Password</label>
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(event) => setConfirmPassword(event.target.value)}
-                        className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
-                      />
-                  </div>
+                  <PasswordInput
+                    label="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(event) => setConfirmPassword(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-black placeholder-slate-500 outline-none focus:border-emerald-500 transition text-sm"
+                  />
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <button
