@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -36,12 +37,24 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <div className="admin-surface text-slate-900">
       <div className="mx-auto flex min-h-screen max-w-[1800px]">
-        <aside className="sticky top-0 hidden h-screen w-76 shrink-0 flex-col border-r border-slate-200 bg-white/88 text-slate-900 shadow-sm backdrop-blur lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-slate-200 bg-white/88 text-slate-900 shadow-sm backdrop-blur lg:flex">
           <div className="flex h-24 items-center border-b border-slate-200 px-7">
-            <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-emerald-700 font-medium">Author Studio</p>
-              <h1 className="mt-2 text-2xl font-medium text-slate-950">Sustainability</h1>
-            </div>
+            <Link href="/dashboard" className="flex items-center gap-3">
+              <span className="relative h-11 w-11 shrink-0">
+                <Image
+                  src="/images/urllogo.webp"
+                  alt="Sustainwheel Logo"
+                  fill
+                  sizes="44px"
+                  className="object-contain"
+                  priority
+                />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 leading-none">Author Studio</p>
+                <h1 className="mt-1 text-lg font-bold text-slate-950 leading-none">Sustainability</h1>
+              </div>
+            </Link>
           </div>
 
           <nav className="flex-1 space-y-1.5 px-4 py-7">
@@ -78,6 +91,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </aside>
 
         <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mb-5 flex items-center gap-3 lg:hidden px-2">
+            <span className="relative h-10 w-10 shrink-0">
+              <Image src="/images/urllogo.webp" alt="Sustainwheel Logo" fill sizes="40px" className="object-contain" priority />
+            </span>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-700 leading-none">Author Studio</p>
+              <h1 className="mt-1 text-lg font-bold text-slate-950 leading-none">Sustainability</h1>
+            </div>
+          </div>
           <div className="mb-5 flex gap-2 overflow-x-auto rounded-xl border border-slate-200 bg-white/85 p-2 shadow-sm lg:hidden">
             {baseNav.map((item) => {
               const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));

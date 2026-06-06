@@ -5,9 +5,9 @@ export const metadata: Metadata = {
   title: "Sustainability Editor",
   description: "Content studio for sustainability articles, authors, and brochures.",
   icons: {
-    icon: '/urllogo.webp',
-    shortcut: '/urllogo.webp',
-    apple: '/urllogo.webp',
+    icon: '/images/urllogo.webp',
+    shortcut: '/images/urllogo.webp',
+    apple: '/images/urllogo.webp',
   },
 };
 
