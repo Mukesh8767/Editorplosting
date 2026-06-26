@@ -170,6 +170,11 @@ export default function AuthorCreatePostPage() {
     }
 
     setLoading(true);
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setMessage("No network connection. Check your internet.");
+      setLoading(false);
+      return;
+    }
     const payload: any = {
       title: title.trim(),
       content: JSON.stringify(blocks),
@@ -201,7 +206,15 @@ export default function AuthorCreatePostPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        const text = await res.text().catch(() => null);
+        setLoading(false);
+        setMessage(text || res.statusText || "Server error while saving post.");
+        return;
+      }
       setLoading(false);
       if (!res.ok) {
         setMessage(data?.error || "Unable to save post.");
@@ -216,7 +229,7 @@ export default function AuthorCreatePostPage() {
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
       console.error(err);
-      setMessage("Operation failed. Check network.");
+      setMessage((err as any)?.message || "Operation failed. Check network.");
       setLoading(false);
     }
   };
